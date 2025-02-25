@@ -15,8 +15,8 @@ with(RunGMLI) {
 		["print", "Hello, other multiverse!"]
 	]);
 	
-	// Obtain output from a multi-line program
-	show_debug_message(run(["out",
+	// Obtain output of each line in a multi-line program
+	show_debug_message(run(["list",
 		"Hello, output!",
 		["string", "{0}{1} output", 2, ["nth", 2]],
 		["string", "{0}{1} output", 3, ["nth", 3]]

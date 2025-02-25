@@ -269,7 +269,9 @@ RunGML_Help_END
 	),
 	"print": new RunGML_Op (
 		function(_i, _l) {
-			show_debug_message(_l[0]);
+			for(var i=0; i<array_length(_l); i++) {
+				show_debug_message(_l[i]);
+			}
 			return [];
 		}, new RunGML_OpDoc (
 			"print",
@@ -1014,16 +1016,16 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 		if array_length(_l) < 1 return;
 		recursion += 1
 		if debug show_debug_message(@"RunGML_I:{0}[{1}].run({2})", name, recursion, _l);
-		var _operator = array_shift(_l);
-		if typeof(_operator) == "array" return run(_operator);
-		if !struct_exists(language, _operator) return _operator;
-		var _op = struct_get(language, _operator);
+		
 		for (var i=0; i<array_length(_l); i++) {
 			if typeof(_l[i]) == "array" {
 				_l[i] = run(_l[i]);
 			}
 		}
 		
+		if !struct_exists(language, _l[0]) return _l;
+		var _operator = array_shift(_l);
+		var _op = struct_get(language, _operator);
 		if debug show_debug_message(@"RunGML_I:{0}[{1}].exec({2}({3}))", name, recursion, _operator, _l);
 		var _op_func = struct_get(_op, "f");
 		var _out = _op_func;

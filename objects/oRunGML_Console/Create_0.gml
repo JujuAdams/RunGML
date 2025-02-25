@@ -13,7 +13,6 @@ backspace_key = vk_backspace;
 
 age = 0;
 
-enabled = false;
 prompt = "> ";
 outprompt = "-> "
 current_line = "";
@@ -52,8 +51,8 @@ alphabet = [
 text_x = 0;
 text_y = display_get_gui_height();
 
-toggle = function() {
-	enabled = !enabled;
+toggle = function(_set=!enabled) {
+	enabled = _set;
 	if enabled {
 		age = 0;
 		if pause_game global.paused = true;
@@ -91,7 +90,11 @@ log_string = function(_s) {
 
 exec_line = function(_l) {
 	var _output = RunGMLI.run(json_parse(string("[{0}]", _l)))
-	if _output != undefined log_line(outprompt + string(_output));
+	if _output == undefined return;
+	if typeof(_output) == "array" {
+		if array_length(_output) < 1 return;
+	}
+	log_line(outprompt + string(_output));
 }
 
 backspace = function() {
