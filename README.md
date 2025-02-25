@@ -1,4 +1,4 @@
-var _operator = array_shift(_l);# RunGML
+# RunGML
 A Lisp-like language embedded in GameMaker and programmed in JSON
 
 ## Overview
