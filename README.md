@@ -21,7 +21,7 @@ The simplest operator returns an empty list.
 When a list is evaluated:
 - An empty list returns nothing.
 - Any elements that are lists will be evaluated first.
-- If the first element is (or evaluates to) a string naming a supported operator, that operator will be applied to the remaining list elements and the result will be returned.
+- If the first element is (or evaluates to) a string naming a supported operator, that operator will be applied to any remaining list elements (after those elements have been evaluated) and the result will be returned.
 - Otherwise, the list of evaluated elements will be returned.
 
 The basic syntax is:
