@@ -45,8 +45,8 @@ global.RunGML_Ops = {
 	"update": new RunGML_Op(
 		"https://snail-dream.itch.io/RunGML",
 		new RunGML_OpDoc(
-			"version",
-			"Returns the current RunGML version number",
+			"update",
+			"Returns the RunGML homepage URL",
 			"[]",
 			"string"
 		)
@@ -293,17 +293,32 @@ RunGML_Help_END
 	),
 	"r": new RunGML_Op (
 		function(_i, _l) {
-			// Reads a register
-			// 0: index
-			if _l[0] >= array_length(_i.registers) {
-				return undefined;
+			if typeof(_l[0]) == "number" {
+				if _l[0] >= array_length(_i.registers) {
+					return undefined;
+				}
+				return _i.registers[_l[0]];
+			} else if struct_exists(_i.language, _l[0]) {
+				for (var i=1; i<array_length(_l); i++) {
+					if typeof(_l[i]) == "number" {
+						_l[i] = _i.registers[_l[i]]
+					}
+					//else _l[i] = undefined
+				}
+				return run(_l);
 			}
-			return _i.registers[_l[0]];
 		}, new RunGML_OpDoc (
-			"",
-			"",
-			"[index]",
-			"[value]"
+			"r",
+@"The read/register operator.
+If the first argument is a number, reads and returns the value saved in the corresponding register index.
+If the first argument names an operator, replaces any other integer arguments with the corresponding register values and runs that operator on the resulting list.
+For example, the following two programs are functionally equivalent:
+	['r', 'add', 0, 1]
+	['add', ['r', 0], ['r', 1]]
+They will return the sum of the values in registers 0 and 1.
+",
+			"[index] or [operator, index0, index1, ...]",
+			"[value] or the rusult of applying the named operator"
 		)
 	),
 	"s": new RunGML_Op(
@@ -316,9 +331,9 @@ RunGML_Help_END
 			}
 			_i.registers[_l[0]] = _l[1];
 		}, new RunGML_OpDoc (
-			"",
-			"",
-			"[]",
+			"s",
+			"The set/save operator.",
+			"[_index]",
 			"[]"
 		)
 	),
