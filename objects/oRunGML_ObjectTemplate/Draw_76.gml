@@ -1,0 +1,1 @@
+run_event("pre_draw");

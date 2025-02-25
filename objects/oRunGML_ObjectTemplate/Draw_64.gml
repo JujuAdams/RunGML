@@ -1,0 +1,1 @@
+run_event("draw_gui");
