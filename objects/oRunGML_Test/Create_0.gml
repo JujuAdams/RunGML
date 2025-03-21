@@ -1,11 +1,10 @@
 // Start an interpreter
 RunGMLI = new RunGML_Interpreter("Test");
+//RunGMLI.debug = true
+
 with(RunGMLI) {
-	show_debug_message(run("foo"));
+	//run(["print", ["help"]]);
 	
-	run(["print", ["help"]]);
-	
-	//debug = true;
 	// Run a single-line program
 	run(["print", "Hello, world!"]);
 
@@ -17,20 +16,30 @@ with(RunGMLI) {
 	
 	// Obtain output of each line in a multi-line program
 	show_debug_message(run(["list",
-		"Hello, output!",
+		"Hello, multiple outputs!",
 		["string", "{0}{1} output", 2, ["nth", 2]],
 		["string", "{0}{1} output", 3, ["nth", 3]]
 	]))
 	
+	// Obtain output from the last line in a multi-line program
+	show_debug_message(run(["last",
+		["v", 0, "Hello, "],
+		["v", 1, "concatenation!"],
+		["r", "add", 0, 1]
+	]))
+	
 	// Run a program from a file
-	run(["runfile", "RunGML/examples/hello.txt"]);
+	run(["runfile", "RunGML/programs/examples/hello.txt"]);
 
 	// Create an object from a file
-	run(["runfile", "RunGML/examples/object.txt"])
+	run(["runfile", "RunGML/programs/examples/object.txt"])
 
-	// Do some math
-	run(["runfile", "RunGML/examples/math.txt"]);
+	// Run an example program
+	run(["example", "math"]);
 
 	//// Display a frame counter
 	//run(["runfile", "RunGML/examples/counter.txt"]);
+	
+	// Create a RunGML console
+	run(["console"]);
 }

@@ -5,11 +5,13 @@ with(oRunGML_Console) {
 global.RunGML_Console = _me;
 
 RunGMLI = new RunGML_Interpreter("Console");
+RunGMLI.parent = id;
 
 last_created = noone;
 
-toggle_key = vk_f9;
+toggle_key = global.RunGML_Console_toggleKey;
 backspace_key = vk_backspace;
+float_precision = global.RunGML_Console_floatPrecision;
 
 age = 0;
 
@@ -45,7 +47,7 @@ alphabet = [
 	"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "=",
 	"!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", 
-	",", ".", "/", "<", ">", "?", " ", ":", ";", "'", "[", "]", "'", "\""
+	",", ".", "/", "<", ">", "?", " ", ":", ";", "'", "[", "]", "'", "\"", "{", "}"
 ];
 
 text_x = 0;
@@ -88,12 +90,25 @@ log_string = function(_s) {
 	}
 }
 
+trim_numeric_string = function(_s) {
+	_s = string_format(_s, 1, float_precision);
+	_s = string_trim_end(_s, ["0"])
+	if string_char_at(_s, string_length(_s)) == "." {
+		_s += "0";
+	}
+	return _s;
+}
+
 exec_line = function(_l) {
 	var _output = RunGMLI.run(json_parse(string("[{0}]", _l)))
 	if _output == undefined return;
 	if typeof(_output) == "array" {
 		if array_length(_output) < 1 return;
 	}
+	if typeof(_output) == "number" {
+		_output = trim_numeric_string(_output);
+	}
+	
 	log_line(outprompt + string(_output));
 }
 
@@ -103,5 +118,17 @@ backspace = function() {
 		cursor_pos -= 1;
 	}
 }
+
+//wrap_string = function(_s, _w=60) {
+//	var _count = 0;
+//	var _safe = 1;
+//	var _delimiters = [" ", ","]
+//	for (var i=0; i<string_length(_s), i++) {
+//		if array_contains(_delimiters, _s[i]) {
+//		}
+//	}
+//}
+
+
 
 toggle();

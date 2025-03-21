@@ -1,5 +1,6 @@
 obj_name = object_get_name(object_index)
 RunGMLI = new RunGML_Interpreter(obj_name);
+RunGMLI.parent = id;
 event_dict = {}
 
 run_event = function(_event) {

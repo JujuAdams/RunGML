@@ -1,15 +1,16 @@
 {
   "FolderOrderSettings":[
+    {"name":"Objects","order":16,"path":"folders/Objects.yy",},
+    {"name":"Utilities","order":1,"path":"folders/Objects/Utilities.yy",},
     {"name":"RunGML","order":15,"path":"folders/RunGML.yy",},
     {"name":"Rooms","order":2,"path":"folders/RunGML/Rooms.yy",},
     {"name":"Scripts","order":1,"path":"folders/RunGML/Scripts.yy",},
-    {"name":"Objects","order":16,"path":"folders/Objects.yy",},
-    {"name":"Utilities","order":1,"path":"folders/Objects/Utilities.yy",},
   ],
   "ResourceOrderSettings":[
     {"name":"oRunGML_Console","order":3,"path":"objects/oRunGML_Console/oRunGML_Console.yy",},
     {"name":"oRunGML_Object","order":1,"path":"objects/oRunGML_Object/oRunGML_Object.yy",},
     {"name":"oRunGML_ObjectTemplate","order":2,"path":"objects/oRunGML_ObjectTemplate/oRunGML_ObjectTemplate.yy",},
+    {"name":"scrRunGML_Config","order":2,"path":"scripts/scrRunGML_Config/scrRunGML_Config.yy",},
     {"name":"scrRunGML","order":1,"path":"scripts/scrRunGML/scrRunGML.yy",},
   ],
 }

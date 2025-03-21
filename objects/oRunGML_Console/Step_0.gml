@@ -30,6 +30,10 @@ switch(keyboard_lastkey) {
 		backspace();
 		break;
 		
+	case vk_delete:
+		clear_line();
+		break;
+		
 	case vk_left:
 		cursor_pos = max(1, cursor_pos - 1);
 		break;
