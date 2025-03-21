@@ -1,3 +1,5 @@
+// Configure settings and define additional operators here
+
 function RunGML_Config() {
 	// Enable debug output?
 	global.RunGML_I_debug = true;
@@ -17,18 +19,39 @@ function RunGML_Config() {
 	// Define your own operators
 	var op_defs = {
 		"test": new RunGML_Op (
-			function() {
+			// Define a function
+			function(_i, _l) {
+				// All operator functions take the same two arguments:
+				// _i: A RunGML_Interpreter instance
+				// _l: A list of arguments
 				return "Hello, config!"
-			}, new RunGML_Doc(
-				"test",
-				"Test operator",
-				"[]",
-				"string"
-			)
+			},
+			
+			// Write documentation
+			new RunGML_Doc(
+				"test", // Name
+				"Test operator", // Description
+				"[]", // Arguments
+				"string" // Output
+			),
+			
+			// Specify constraints
+			[
+				new RunGML_Constraint_ArgCount("geq", 0)
+			]
+		),
+		"test_constant": new RunGML_Op (
+			42, // Operators can also return a constant value instead of executing a function
+			new RunGML_Doc(
+				"test_constant", // Name
+				"Test constant", // Description
+				"[]", // Arguments
+				"42" // Output
+			),
 		)
 	}
 	
-	// (Adding your operators to the language)
+	// This adds your operators to the language
 	struct_foreach(op_defs,
 		function(_name, _value) {
 			if global.RunGML_Config_overwrite or !struct_exists(global.RunGML_Ops, _name) {

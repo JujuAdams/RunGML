@@ -15,27 +15,135 @@ function RunGML_Doc(_name="RunGML Operator", _desc="Description", _args="[]", _o
 	}
 }
 
-function RunGML_Op(_f, _doc) constructor {
-	f = _f
-	doc = _doc
-	name = struct_get(doc, "name")
-	help = function() {
-		return doc.print();
+function RunGML_Constraint() constructor {
+	check = function(_l) {return true};
+}
+
+function RunGML_Constraint_ArgCount(_op="eq", _count=noone, _warn=true) : RunGML_Constraint() constructor {
+	count = _count
+	op = _op
+	warn = _warn;
+	err_msg = @"
+ArgCount constraint violated
+	args: {0}
+	count: {1}
+	check: {2}"
+	doc = function() {return string("? {0} {1}", op, count)}
+	check = function(_l) {
+		var _valid;
+		switch(op) {
+			case "eq":
+				_valid = array_length(_l) == count;
+				break;
+			case "nq":
+				_valid = array_length(_l) != count;
+				break;
+			case "gt":
+				_valid = array_length(_l) > count;
+				break;
+			case "geq":
+				_valid = array_length(_l) >= count;
+				break;
+			case "lt":
+				_valid = array_length(_l) < count;
+				break;
+			case "leq":
+				_valid = array_length(_l) <= count;
+				break;
+			case "choose":
+				_valid = array_contains(count, array_length(_l));
+				break;
+		}
+		if !_valid and warn show_debug_message(string(err_msg, _l, array_length(_l), doc()))
+		return _valid;
 	}
 }
 
-function RunGML_Error() constructor {
-	error = "RunGML_Error";
+function RunGML_Constraint_ArgType(_indexes=[], _types=noone, _warn=true): RunGML_Constraint() constructor {
+	indexes = _indexes;
+	types = _types;
+	if types == "numeric" types = ["number", "int32", "int64"]
+	warn = _warn;
+	doc = function() {return string("indexes: {0}\nvalid types: {1}", indexes, types)}
+	err_msg = @"
+ArgType constraint violated
+	args: {0}
+	bad index: {1}
+	bad value type: {2}
+	valid types: {3}"
+	
+	check = function(_l) {
+		if types == noone return true;
+		var _index, _val, _type;
+		if indexes == "all" {
+			for (var i=0; i<array_length(_l); i++) {
+				_val = _l[i];
+				_type = typeof(_val);
+				if not array_contains(types, _type) {
+					if warn show_debug_message(string(err_msg, _l, i, _type, types));
+					return false;
+				}
+			}
+		} else {
+			for (var i=0; i<array_length(indexes); i++) {
+				_index = indexes[1];
+				if _index >= array_length(_l) {
+					if warn show_debug_message("An ArgType constraint was expecting at least {0} arguments, but only got {1}", _index, array_length(_l));
+					return false;
+				}
+				_val = _l[_index];
+				_type = typeof(_val)
+				if not array_contains(types, _type){
+					if warn show_debug_message(string(err_msg, _l, _index, _type, types));
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }
 
-function RunGML_Error_InvalidOp(_op) : RunGML_Error() constructor {
-	error = string("{0} is not a valid RunGML operator. Try typing 'help'", _error);
+function RunGML_Op(_f, _doc, _constraints=[]) constructor {
+	f = _f;
+	doc = _doc;
+	constraints = _constraints;
+	name = struct_get(doc, "name");
+	help = function() {
+		return doc.print();
+	}
+	
+	valid = function(_l) {
+		var _constraint, _valid;
+		for(var i=0; i<array_length(constraints); i++) {
+			_constraint = constraints[i];
+			
+			_valid = constraints[i].check(_l)
+			if !_valid {
+				var _err = new RunGML_Error_InvalidArgs(name)
+				_err.warn();
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
-function RunGML_Error_InvalidArgs(_op, _count) : RunGML_Error() constructor {
-	error = string("Invalid argcount {0} for operator {1}", _count, _op);
+function RunGML_Error(_msg="") constructor {
+	msg = "RunGML_Error: " + string(_msg);
+	warn = function() {
+		show_debug_message(msg);
+	}
 }
 
+function RunGML_Error_InvalidArgs(_op) : RunGML_Error() constructor {
+	msg = string("	operator: {0}", _op);
+}
+
+/* Operator Definitions
+Additional operators should be defined in scrRunGML_Config
+Make backup of that file before updating RunGML
+Then you can restore your custom settings and operators after updating
+*/
 global.RunGML_Ops = {
 	#region Metadata
 	"version": new RunGML_Op(
@@ -244,7 +352,7 @@ Or run ["manual"] to display full documentation for all operators.
 			return _i.run(_l);
 		}, new RunGML_Doc (
 			"run",
-			"Run arguments as a program, treating the first argument as an operator.",
+			"Run arguments as a program.",
 			"[*]",
 			"*"
 		)
@@ -257,7 +365,7 @@ Or run ["manual"] to display full documentation for all operators.
 			"Execute a string as a program.",
 			"[string]",
 			"*"
-		)
+		), [new RunGML_Constraint_ArgCount("eq", 1)]
 	),
 	"last": new RunGML_Op (
 		function(_i, _l) {
@@ -733,7 +841,10 @@ Behavior depends on the number of arguments:
 			"Subtract two numbers",
 			"[A, B]",
 			"A - B"
-		)
+		), [
+			new RunGML_Constraint_ArgCount("eq", 2),
+			new RunGML_Constraint_ArgType("all", "numeric")
+		]
 	),
 	"mult": new RunGML_Op(
 		function(_i, _l) {
@@ -1200,9 +1311,13 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 			recursion -= 1;
 			return _l;
 		}
-		var _operator = array_shift(_l);
-		var _op = struct_get(language, _operator);
-		if debug show_debug_message(@"RunGML_I:{0}[{1}].exec({2}({3}))", name, recursion, _operator, _l);
+		var _op_name = array_shift(_l);
+		var _op = struct_get(language, _op_name);
+		if debug show_debug_message(@"RunGML_I:{0}[{1}].exec({2}({3}))", name, recursion, _op_name, _l);
+		if not _op.valid(_l) {
+			recursion -= 1;
+			return undefined;
+		}
 		var _op_func = struct_get(_op, "f");
 		var _out;
 		if typeof(_op_func) == "method" _out = script_execute(_op_func, self, _l);
