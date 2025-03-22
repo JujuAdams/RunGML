@@ -93,15 +93,18 @@ function RunGML_Constraint_ArgType(_indexes=[], _types=noone, _warn=true): RunGM
 	}
 }
 
-function RunGML_Op(_name, _f, _doc="", _constraints=[]) constructor {
+function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	if struct_exists(global.RunGML_Ops, _name) and not global.RunGML_Config_overwrite return;
 
 	name = _name;
+	aliases = [];
 	f = _f;
-	doc = _doc;
+	desc = _desc;
 	constraints = _constraints;
 	help = function() {
-		var _docstring = string(@"- {0}: {1}", name, doc);
+		var _docstring = string(@"- {0}", name);
+		if array_length(aliases) > 0 _docstring += string(" ({0})", aliases)
+		_docstring += string("\n    - desc: {0}", desc);
 		var _n_constraints = array_length(constraints);
 		if _n_constraints > 0 {
 			_docstring += "\n    - constraints:";
@@ -109,6 +112,15 @@ function RunGML_Op(_name, _f, _doc="", _constraints=[]) constructor {
 				_docstring += string("\n        - {0}", constraints[i].doc())
 			}
 		}
+
+		//var _n_aliases = array_length(aliases);
+		//if _n_aliases > 0 {
+		//	_docstring += "\n    - aliases:";
+		//	for (var i=0; i<_n_aliases; i++) {
+		//		_docstring += string("\n        - {0}", aliases[i])
+		//	}
+		//}
+
 		return _docstring;
 	}
 	
@@ -136,6 +148,14 @@ function RunGML_Op(_name, _f, _doc="", _constraints=[]) constructor {
 	}
 
 	struct_set(global.RunGML_Ops, name, self);
+}
+
+function RunGML_Alias(_nickname, _name, _ops=global.RunGML_Ops) {
+	if not struct_exists(_ops, _name) struct_set(_ops, _nickname, _name);
+	else {
+		struct_set(_ops, _nickname, struct_get(_ops, _name));
+		array_push(struct_get(struct_get(_ops, _name), "aliases"), _nickname);
+	}
 }
 
 /* Operator Definitions
@@ -1231,7 +1251,6 @@ new RunGML_Op("nggyu",
 new RunGML_Op ("test_constant", 23);
 #endregion Misc
 
-
 // Interpreter
 function RunGML_Interpreter(_name="RunGML_I") constructor {
 	name = _name;
@@ -1263,3 +1282,9 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 }
 
 RunGML_Config();
+
+RunGML_Alias("var", "v");
+RunGML_Alias("q", "quit");
+RunGML_Alias("multiply", "mult");
+RunGML_Alias("subtract", "sub");
+RunGML_Alias("divide", "div");
