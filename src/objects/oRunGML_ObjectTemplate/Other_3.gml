@@ -1,0 +1,1 @@
+run_event("game_end");
