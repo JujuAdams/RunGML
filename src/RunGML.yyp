@@ -22,7 +22,6 @@
     {"$GMIncludedFile":"","%Name":"hello.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"hello.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"math.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"math.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"object.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"object.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
-    {"$GMIncludedFile":"","%Name":"snail.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"snail.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],

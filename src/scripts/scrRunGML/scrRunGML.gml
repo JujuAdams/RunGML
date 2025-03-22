@@ -1280,6 +1280,7 @@ Behavior depends on the number of arguments:
 	"quit": new RunGML_Op(
 		function(_i, _l) {
 			game_end();
+			return [];
 		}, new RunGML_Doc (
 			"quit",
 			"Quit the game",
@@ -1287,6 +1288,18 @@ Behavior depends on the number of arguments:
 			"[]"
 		)
 	),
+	
+	"rickroll": new RunGML_Op(
+		function(_i, _l) {
+			url_open("https://sdlwdr.github.io/rickroll/rickroll.mp4");
+			return [];
+		}, new RunGML_Doc (
+			"rickroll",
+			"Do a rickroll!",
+			"[]",
+			"[]"
+		)
+	)
 }
 
 
