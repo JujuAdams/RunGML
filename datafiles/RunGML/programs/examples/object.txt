@@ -1,5 +1,0 @@
-["object", 0, 0, "Instances",
-	{
-		"create": ["print", "Hello, file object!"]
-	}
-]
