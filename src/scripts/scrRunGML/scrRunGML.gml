@@ -22,7 +22,7 @@ function RunGML_Constraint_ArgCount(_op="eq", _count=noone, _warn=true) : RunGML
     - args: {0}
     - count: {1}
     - check: {2}"
-	doc = function() {return string("ArgCount: ? {0} {1}", op, count)}
+	doc = function() {return string("ArgCount: {0} {1}", op, count)}
 	check = function(_l) {
 		var _valid;
 		switch(op) {
@@ -103,7 +103,7 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	constraints = _constraints;
 	help = function() {
 		var _docstring = string(@"- {0}", name);
-		if array_length(aliases) > 0 _docstring += string(" ({0})", aliases)
+		if array_length(aliases) > 0 _docstring += string("\n    - aliases: {0}", aliases)
 		_docstring += string("\n    - desc: {0}", desc);
 		var _n_constraints = array_length(constraints);
 		if _n_constraints > 0 {
@@ -237,25 +237,16 @@ new RunGML_Op("help",
 # RunGML
 
 Version: {0}
+
 Homepage: {1}
 
-RunGML is a runtime scripting language embedded in GameMaker Language.
-
-It has a Lisp-like structure of nested lists, with a JSON-compatible syntax.
-
-You can use it to provide modding support, encrypt secret content, or make arbitrary changes to your game while it runs.
-
-Be warned: the syntax prioritizes concision over readability, and the implemenation prioritizes flexibility over safety.
-
-Use at your own risk.
-
-Run ["update"] to visit the homepage and check for updates, report bugs, or request features.
+Run ["update"] to visit the homepage to read documentation, check for updates, report bugs, or request features.
 
 The following {2} operators are currently supported: {3}
 
 Try running ["help", "some_operator_name"] to get documentation on a specific operator.
 
-Or run ["manual"] to display full documentation for all operators.
+Or run ["manual"] to generate full documentation for all operators.
 ', 
 					["version"],
 					["global", "RunGML_homepage"],
@@ -277,11 +268,13 @@ new RunGML_Op ("manual",
 		if file_exists(_filename) file_delete(_filename);
 		var _f = file_text_open_append(_filename)
 		var _ops = variable_struct_get_names(_i.language);
-		var _op;
+		var _op, _op_name;
 		file_text_write_string(_f, _i.run(["help"]));
 		file_text_write_string(_f, "\n\n# Operators\n\n");
 		for (var i=0; i<array_length(_ops); i++) {
-			_op = struct_get(_i.language, _ops[i])
+			_op_name = _ops[i];
+			_op = struct_get(_i.language, _op_name)
+			if _op.name != _op_name continue; // Don't re-document aliases
 			file_text_write_string(_f, "\n"+_op.help()+"\n")
 		}
 		file_text_close(_f);
@@ -334,6 +327,19 @@ new RunGML_Op("clear",
 @"If run from a console, clear that console's history
     - args: []
     - output: instance"
+)
+
+new RunGML_Op ("alias",
+	function(_i, _l=[]) {
+		RunGML_Alias(_l[0], _l[1])
+	},
+@"Create an operator alias
+    - args: [nickname, name]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("eq", 2),
+		new RunGML_Constraint_ArgType("all", ["string"])
+	]
 )
 
 #endregion Metadata
@@ -1051,6 +1057,18 @@ new RunGML_Op("display_h",
 @"Returns the height of the display.
     - args: []
     - output: [height]"
+)
+
+new RunGML_Op("fullscreen",
+	function(_i, _l=[]) {
+		//
+		if array_length(_l) > 0 window_set_fullscreen(_l[0])
+		else window_set_fullscreen(not window_get_fullscreen());
+		return [];
+	},
+@"Toggle fullscreen mode.  Set status with a single boolean argument, or swap status with no arguments.
+    - args: [(bool)]
+    - output: []"
 )
 
 #endregion Displays
