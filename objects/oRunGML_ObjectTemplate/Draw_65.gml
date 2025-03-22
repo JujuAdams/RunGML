@@ -1,1 +1,0 @@
-run_event("window_resize");

@@ -1,1 +1,0 @@
-run_event("draw_gui_begin");
