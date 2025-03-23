@@ -22,20 +22,24 @@ In addition to the RunGML language definition and interpreter, this library also
 ## Running Programs
 
 First create an instance of the RunGML interpreter:
+
 `RunGMLI = new RunGML_Interpreter()`
 
 Then you can pass your program as a list:
+
 `RunGMLI.run(["print", "Hello, world!"])`
 
 You can also execute programs that are stored in JSON files:
+
 `RunGMLI.runfile(["filepath"])`
 
 Programs should be stored with a `.txt` extension instead of `.json`.
 
 Programs stored in `[included files directory]/RunGML/programs/` can be quickly run by name (excluding the extension):
+
 `RunGMLI.runfile(["filename"])`
 
-You can also write and run code from within your game using the console (see below).
+You can also write and run code from within your game using the [console](#console).
 
 ## Syntax
 
@@ -47,14 +51,33 @@ The simplest operator (`"pass"`) is: `function(arg_list){return []}`
 
 In addition to lists there are also strings, numbers, and structs.
 
-### List Evaluation Rules
+### List Evaluation Procedure
 
+The RunGML Interpreter evaluates a list as follows:
 - An empty list returns nothing.
 - Any list elements that are lists will be evaluated first (recursively).
 - If the first element is (or evaluates to) a string naming an operator, that operator will be applied to any remaining elements and the result will be returned.
 - Otherwise, the first element itself will be returned.
 
+In code:
 
+```
+run = function(_l) {
+    if array_length(_l) < 1 return;
+    for (var i=0; i<array_length(_l); i++) {
+        if typeof(_l[i]) == "array" {
+            _l[i] = run(_l[i]);
+        }
+    }
+    var _op_name = array_shift(_l);
+    var _out = _op_name;
+    if struct_exists(language, _op_name) {
+        var _op = struct_get(language, _op_name);
+        var _out = _op.exec(self, _l);
+    }
+    return _out;
+}
+```
 
 ### Single-Line Programs
 
@@ -186,4 +209,10 @@ Combining quote types in this way is not advised.  Consistent use of single quot
 This library includes two template objects, `oRunGML_Object` and `oRunGML_ObjectTemplate`.
 - `oRunGML_Object` provides only barebones functionality
 
+## Operator Definitions
 
+### Constraints
+
+### Documentation
+
+### Aliases
