@@ -11,15 +11,35 @@ You can use it to:
 - Debug your code
 - Provide modding support
 - Add secret content from encrypted files
-- Make arbitrary changes to your game while it runs.
-
-### Features
+- Make arbitrary changes to your game while it runs
 
 In addition to the RunGML language definition and interpreter, this library also includes:
-- An interactive console to write and run code inside a running game (see `"console"`)
-- A template object with events pre-defined to execute RunGML programs (see `"object"`)
+- An [interactive console](#console)
+- A [template object](#objects) with events pre-defined to execute RunGML programs
 - A test room, test object, and example programs to demonstrate basic functionality
-- Documentation (see `"help"`)
+- Thorough documentation that can be read in [`scrRunGML`](src/scripts/scrRunGML/scrRunGML.gml) or accessed using `"help"` and `"manual`"
+
+## Running Programs
+
+First create an instance of the RunGML interpreter:
+
+`RunGMLI = new RunGML_Interpreter()`
+
+Then you can pass your program as a list:
+
+`RunGMLI.run(["print", "Hello, world!"])`
+
+You can also execute programs that are stored in JSON files:
+
+`RunGMLI.runfile(["filepath"])`
+
+Programs should be stored with a `.txt` extension instead of `.json`.
+
+Programs stored in `[included files directory]/RunGML/programs/` can be quickly run by name (excluding the extension):
+
+`RunGMLI.runfile(["filename"])`
+
+You can also write and run code from within your game using the [console](#console).
 
 ## Syntax
 
@@ -29,12 +49,35 @@ The simplest program is: `[]`
 
 The simplest operator (`"pass"`) is: `function(arg_list){return []}`
 
-### List Evaluation Rules
+In addition to lists there are also strings, numbers, and structs.
 
+### List Evaluation Procedure
+
+The RunGML Interpreter evaluates a list as follows:
 - An empty list returns nothing.
 - Any list elements that are lists will be evaluated first (recursively).
 - If the first element is (or evaluates to) a string naming an operator, that operator will be applied to any remaining elements and the result will be returned.
 - Otherwise, the first element itself will be returned.
+
+In code:
+
+```
+run = function(_l) {
+    if array_length(_l) < 1 return;
+    for (var i=0; i<array_length(_l); i++) {
+        if typeof(_l[i]) == "array" {
+            _l[i] = run(_l[i]);
+        }
+    }
+    var _op_name = array_shift(_l);
+    var _out = _op_name;
+    if struct_exists(language, _op_name) {
+        var _op = struct_get(language, _op_name);
+        var _out = _op.exec(self, _l);
+    }
+    return _out;
+}
+```
 
 ### Single-Line Programs
 
@@ -126,15 +169,50 @@ For example, the following programs are equivalent (they will all return the val
 ]
 ```
 
-### Console Syntax
+## Console
 
-The console has some minor syntax conveniences:
+The console object (`oRunGML_Console`) provides a convenient way to debug and modify your game at runtime.
+
+Console instances are persistent, but there can only be one instance at a time.  If you create a second it will destroy the first automatically.  Add one to your starting room and it will be usable throughout your game.
+
+After creating an instance of oRunGML_Console, you can toggle it on and off by pressing `F9`.  This keybind can be changed by setting `global.RunGML_Console_toggleKey`, defined in `scrRunGML_Config`.
+
+In RunGML code, the `"console"` operator will return a reference to the console instance, creating a new one first if needed.
+
+The console gets its own instance of the RunGML interpreter.  When running RunGML code in the console, the `"parent"` operator will return a reference to the console instance.
+
+You can modify the console at runtime just like any other object instance.  For example, the following program will set the console's text color to red:
+
+```
+['inst',  ['console'], 'text_color', ['rgb', 255, 0, 0]]
+```
+
+### Console Syntax Differences
+
+The console has some minor syntax conveniences that are not supported for programs stored in JSON files:
 - It permits the use of single or double quotes, treating them idendically.
-- It does not require brackets around the top-level list.
+- It automatically adds a set of brackets around your command.
 
-For example, this is a valid console command despite not being a valid JSON file:
+So while a hello world program stored as JSON looks like: `["print", "Hello, world!"]`
 
-```
-'print", "Hello, World'
-```
+The equivalent console command can look like: `'print", "Hello, World'`
 
+Combining quote types in this way is not advised.  Consistent use of single quotes in the console is probably fine.  Future updates may change the way quotation marks and escape characters are handled to improve consistency.
+
+### Console-Specific Operators
+
+- The `"clear"` operator will clear the console's history.
+- The `"parent"` operator will return a reference to the console instance.
+
+## Objects
+
+This library includes two template objects, `oRunGML_Object` and `oRunGML_ObjectTemplate`.
+- `oRunGML_Object` provides only barebones functionality
+
+## Operator Definitions
+
+### Constraints
+
+### Documentation
+
+### Aliases
