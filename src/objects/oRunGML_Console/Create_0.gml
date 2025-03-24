@@ -6,6 +6,7 @@ global.RunGML_Console = _me;
 
 RunGMLI = new RunGML_Interpreter("Console");
 RunGMLI.parent = id;
+RunGMLI.throw_errors = true;
 
 last_created = noone;
 
@@ -97,6 +98,37 @@ trim_numeric_string = function(_s) {
 		_s += "0";
 	}
 	return _s;
+}
+
+wrap_string = function(_s, _w=250, _sep=[" ", ",", "-", "_", ")", "]", "}", "\n"]) {
+	var _wrapped, _last, _len, _portion, _remaining, _s_line, _char, _done;
+	var _lines = string_split(_s, "\n");
+	
+	for (var _line=0; _line<array_length(_lines); _line++) {
+		_wrapped = "";
+		_s_line = _lines[_line];
+		_done = false
+		while not _done {
+			_last = noone;
+			for (var i=1; i<=_w; i++) {
+				if i > string_length(_s_line) _last = i-1;
+				_char = string_char_at(_s_line, i);
+				if array_contains(_sep, _char) _last = i;
+			}
+			if _last == noone _last = _w;
+			_portion = string_copy(_s_line, 1, _last)
+			_remaining = string_length(_s_line) - string_length(_portion)
+			if string_length(_wrapped) > 0 _wrapped += "\n";
+			_wrapped += _portion;
+			if _remaining == 0 {
+				_done = true;
+				continue
+			}
+			_s = string_copy(_s, _last+1, _remaining);	
+		}
+		_lines[_line] = _wrapped;
+	}
+	return string_join_ext("\n", _lines);
 }
 
 exec_line = function(_l) {

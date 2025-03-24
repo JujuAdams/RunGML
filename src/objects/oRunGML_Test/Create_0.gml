@@ -25,8 +25,20 @@ with(RunGMLI) {
 	show_debug_message(run(["last",
 		["v", 0, "Hello, "],
 		["v", 1, "concatenation!"],
-		["r", "add", 0, 1]
+		["r", "cat", 0, 1]
 	]))
+	
+	//run(["pass",
+	//	["v", 0, 1],
+	//	["v", 1, 42],
+	//	["while", {
+	//		"check": ["r", "lt", 0, 1],
+	//		"do": ["pass",
+	//			["v", 0, ["add", 5, ["v", 0]]],
+	//			["r", "print", 0]
+	//		]
+	//	}]
+	//])
 	
 	// Run a program from a file
 	run(["runfile", "RunGML/programs/examples/hello.txt"]);
