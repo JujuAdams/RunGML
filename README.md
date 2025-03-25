@@ -177,15 +177,21 @@ Console instances are persistent, but there can only be one instance at a time. 
 
 After creating an instance of oRunGML_Console, you can toggle it on and off by pressing `F9`.  This keybind can be changed by setting `global.RunGML_Console_toggleKey`, defined in `scrRunGML_Config`.
 
-In RunGML code, the `"console"` operator will return a reference to the console instance, creating a new one first if needed.
+In RunGML code, the `"console"` operator facilitates interaction with the console instance, creating a new one first if needed.
 
-The console gets its own instance of the RunGML interpreter.  When running RunGML code in the console, the `"parent"` operator will return a reference to the console instance.
+When called with 0 arguments it returns the console instance's ID.  With one argument it gets an instance variable value, and with two arguments it sets a variable.
 
-You can modify the console at runtime just like any other object instance.  For example, the following program will set the console's text color to red:
+For example, the following two programs are equivalent ways of setting the console's text color to red:
 
 ```
 ['inst',  ['console'], 'text_color', ['rgb', 255, 0, 0]]
 ```
+
+```
+['console', 'text_color', ['rgb', 255, 0, 0]]
+```
+
+Note that the console gets its own instance of the RunGML interpreter.  When running RunGML code in the console, the `"parent"` operator is equivalent to the `"console"` operator.
 
 ### Console Syntax Differences
 
