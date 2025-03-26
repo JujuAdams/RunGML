@@ -69,7 +69,7 @@ switch(keyboard_lastkey) {
 		break;
 		
 	default:
-		if !array_contains(alphabet, string_lower(keyboard_lastchar)) {
+		if !array_contains(alphabet, keyboard_lastchar) {
 			break;
 		}
 		

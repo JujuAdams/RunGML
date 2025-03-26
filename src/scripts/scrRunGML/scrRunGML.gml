@@ -1,9 +1,34 @@
 #macro RunGML_version "2025_03_23_00"
 #macro RunGML_homepage "https://github.com/sdelaughter/RunGML"
 
+global.RunGML_Colors = {
+	"aqua": c_aqua,
+	"black": c_black,
+	"blue": c_blue,
+	"dkgray": c_dkgray,
+	"dkgrey": c_dkgrey,
+	"fuchsia": c_fuchsia,
+	"gray": c_gray,
+	"grey": c_grey,
+	"green": c_green,
+	"lime": c_lime,
+	"ltgray": c_ltgray,
+	"ltgrey": c_ltgrey,
+	"maroon": c_maroon,
+	"navy": c_navy,
+	"olive": c_olive,
+	"orange": c_orange,
+	"purple": c_purple,
+	"red": c_red,
+	"silver": c_silver,
+	"teal": c_teal,
+	"white": c_white,
+	"yellow": c_yellow
+}
+
 function RunGML_Interpreter(_name="RunGML_I") constructor {
 	name = _name;
-	language = global.RunGML_Ops;
+	ops = global.RunGML_Ops;
 	aliases = global.RunGML_Aliases;
 	debug = global.RunGML_I_debug;
 	throw_errors = global.RunGML_throwErrors;
@@ -25,10 +50,14 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 		while struct_exists(aliases, _op_name) {
 			_op_name = struct_get(aliases, _op_name);	
 		}
-		if struct_exists(language, _op_name) {
-			var _op = struct_get(language, _op_name);
+		if struct_exists(ops, _op_name) {
+			var _op = struct_get(ops, _op_name);
 			if debug show_debug_message(@"RunGML_I:{0}[{1}].exec({2}({3}))", name, recursion, _op_name, _l);
 			_out = _op.exec(self, _l);
+			if is_instanceof(_out, RunGML_Error) {
+				_out.warn(self);
+				//_out = undefined;
+			}
 		}
 		recursion -= 1;
 		return _out;
@@ -147,7 +176,7 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true): 
 }
 
 function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
-	if struct_exists(global.RunGML_Ops, _name) and not global.RunGML_Config_overwrite return;
+	if struct_exists(global.RunGML_Ops, _name) and not global.RunGML_overwriteOps return;
 
 	name = _name;
 	aliases = [];
@@ -170,13 +199,14 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	
 	exec = function(_i, _l) {
 		var _out = undefined;
-		if valid(_i, _l) {
+		var _err = valid(_i, _l);
+		if is_instanceof(_err, RunGML_Error) return _err;
+		else {
 			if typeof(f) == "method" {
 				try {
 					_out = script_execute(f, _i, _l);
 				} catch(_e) {
-					new RunGML_Error(string("Operator '{0}' failed to execute list: {1}\nTry: ['help', '{0}']", name, _l)).warn(_i);
-					return undefined;
+					_out = new RunGML_Error(string("Operator '{0}' failed to execute list: {1}\nOriginal error:\n{2}", name, _l, _e));
 				}
 			}
 			else _out = f;
@@ -201,21 +231,33 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	struct_set(global.RunGML_Ops, name, self);
 }
 
-function RunGML_alias(_nickname, _name, _aliases=global.RunGML_Aliases, _ops=global.RunGML_Ops) {
+function RunGML_alias(_nickname, _name, _i = noone) {
+	var _aliases, _ops;
+	if _i == noone {
+		_aliases = global.RunGML_Aliases;
+		_ops = global.RunGML_Ops;
+	} else {
+		_aliases = _i.aliases;
+		_ops = _i.ops;
+	}
+	var _out = [];
 	if struct_exists(_aliases, _nickname) {
-		new RunGML_Error(string("Cannot redefine alias: {0} -> {1}", _nickname, struct_get(_aliases, _nickname))).warn();
-		return -1;
+		_out = new RunGML_Error(string("Cannot redefine alias: {0} -> {1}", _nickname, struct_get(_aliases, _nickname)));
 	}
 	if struct_exists(_ops, _nickname) {
-		new RunGML_Error(string("Cannot create alias with defined operator as nickname: {0}", _nickname, struct_get(_aliases, _nickname))).warn();
-		return -1;
+		_out = new RunGML_Error(string("Cannot create alias with defined operator as nickname: {0}", _nickname, struct_get(_aliases, _nickname)));
 	}
 	if not struct_exists(_ops, _name) {
-		new RunGML_Error(string("Cannot create alias for non-existent operation: {0}", _name)).warn();
-		return -1;
+		_out = new RunGML_Error(string("Cannot create alias for non-existent operator: {0}", _name));
 	}
+	if is_instanceof(_out, RunGML_Error) {
+		if _i == noone _out.warn();
+		return _out;
+	}
+	
 	struct_set(_aliases, _nickname, _name);
 	array_push(struct_get(struct_get(_ops, _name), "aliases"), _nickname);
+	return [];;
 }
 
 function RunGML_clone(_l) {
@@ -314,7 +356,7 @@ new RunGML_Op("update",
 	
 new RunGML_Op("op_count",
 	function(_i, _l=[]) {
-		return struct_names_count(_i.language);
+		return struct_names_count(_i.ops);
 	},
 @"Returns the number of supported operators
     - args: []
@@ -324,7 +366,7 @@ new RunGML_Op("op_count",
 	
 new RunGML_Op("op_list",
 	function(_i, _l=[]) {
-		var _op_list = struct_get_names(_i.language);
+		var _op_list = struct_get_names(_i.ops);
 		array_sort(_op_list, true);
 		return _op_list;
 	},
@@ -336,7 +378,7 @@ new RunGML_Op("op_list",
 	
 new RunGML_Op("op_names",
 	function(_i, _l=[]) {
-		var _op_list = struct_get_names(_i.language);
+		var _op_list = struct_get_names(_i.ops);
 		array_sort(_op_list, true);
 		var _str = "";
 		for (var i=0; i<array_length(_op_list); i++) {
@@ -358,7 +400,7 @@ new RunGML_Op("help",
 			if struct_exists(_i.aliases, _op_name) {
 				_op_name = struct_get(_i.aliases, _op_name);
 			}
-			var _op = struct_get(_i.language, _op_name)
+			var _op = struct_get(_i.ops, _op_name)
 			if !is_instanceof(_op, RunGML_Op){
 				return string("{0} is not a valid RunGML operator. Try \"help\".", _l[0])
 			}
@@ -402,14 +444,14 @@ new RunGML_Op ("manual",
 		if array_length(_l) > 0 _filename = _l[0];
 		if file_exists(_filename) file_delete(_filename);
 		var _f = file_text_open_append(_filename)
-		var _ops = variable_struct_get_names(_i.language);
+		var _ops = variable_struct_get_names(_i.ops);
 		array_sort(_ops, true);
 		var _op, _op_name;
 		file_text_write_string(_f, _i.run(["help"]));
 		file_text_write_string(_f, "\n\n## Operators\n");
 		for (var i=0; i<array_length(_ops); i++) {
 			_op_name = _ops[i];
-			_op = struct_get(_i.language, _op_name)
+			_op = struct_get(_i.ops, _op_name)
 			if _op.name != _op_name continue; // Don't re-document aliases
 			file_text_write_string(_f, "\n"+_op.help()+"\n")
 		}
@@ -417,7 +459,7 @@ new RunGML_Op ("manual",
 		url_open(_filename)
 		return [];
 	},
-@"Write full documentation for the RunGML language to a file in the save directory.
+@"Write full documentation for all RunGML operators to a file and view it in the browser.
     - args: [(filename)]
     - output: []",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -461,12 +503,26 @@ new RunGML_Op("console",
 		if !instance_exists(oRunGML_Console) {
 			global.RunGML_Console = instance_create_depth(0, 0, 0, oRunGML_Console);
 		}
-		return global.RunGML_Console
+		switch(array_length(_l)) {
+			case 0:
+				return global.RunGML_Console;
+				break;
+			case 1:
+				return variable_instance_get(global.RunGML_Console, _l[0])
+				break;
+			case 2:
+				variable_instance_set(global.RunGML_Console, _l[0], _l[1])
+				return [];
+				break;
+		}
 	},
 @"Return a reference to the RunGML console, creating one if it doesn't exist
     - args: []
     - output: instance",
-	[new RunGML_Constraint_ArgCount("eq", 0)]
+	[
+		new RunGML_Constraint_ArgCount("leq", 2),
+		new RunGML_Constraint_ArgType(0, "string", false)
+	]
 )
 	
 new RunGML_Op("clear",
@@ -492,15 +548,15 @@ new RunGML_Op ("alias",
 				var _out = [];
 				if struct_exists(_i.aliases, _l[0]) {
 					var _name =  struct_get(_i.aliases, _l[0]);
-					_out = array_concat([_name], struct_get(struct_get(_i.language, _name), "aliases"));
-				} else if struct_exists(_i.language, _l[0]) {
-					_out = array_concat([_l[0]], struct_get(struct_get(_i.language, _l[0]), "aliases"));
+					_out = array_concat([_name], struct_get(struct_get(_i.ops, _name), "aliases"));
+				} else if struct_exists(_i.ops, _l[0]) {
+					_out = array_concat([_l[0]], struct_get(struct_get(_i.ops, _l[0]), "aliases"));
 				}
 				return _out;
 				break;
 			case 2:
 			default:
-				return RunGML_alias(_l[0], _l[1]);
+				return RunGML_alias(_l[0], _l[1], _i);
 				break;
 		}		
 	},
@@ -770,7 +826,7 @@ new RunGML_Op ("print",
 
 #endregion Debugging
 	
-#region Text
+#region Strings
 
 new RunGML_Op ("string",
 	function(_i, _l) {
@@ -795,24 +851,8 @@ new RunGML_Op ("cat",
     - args: [value, (...)]
     - output: [string]",
 )
-	
-new RunGML_Op("draw_text",
-	function(_i, _l) {
-		// x, y, string
-		draw_text(_l[0], _l[1], _l[2]);
-	},
-@"Draw text
-    - args: [x, y, string]
-    - output: []",
-	[
-		new RunGML_Constraint_ArgCount("eq", 3),
-		new RunGML_Constraint_ArgType(0, "numeric"),
-		new RunGML_Constraint_ArgType(1, "numeric"),
-		new RunGML_Constraint_ArgType(2, "string")
-	]
-)
 
-#endregion Types
+#endregion Strings
 		
 #region Accessors
 new RunGML_Op ("var",
@@ -839,9 +879,11 @@ new RunGML_Op ("var",
 new RunGML_Op ("reference",
 	function(_i, _l) {
 		if array_length(_l) == 0 return _i.registers;
-		if struct_exists(_i.language, _l[0]) {
+		if struct_exists(_i.ops, _l[0]) {
 			for (var i=1; i<array_length(_l); i++) {
-				_l[i] = struct_get(_i.registers, _l[i]);
+				if struct_exists(_i.registers, _l[i]) {
+					_l[i] = struct_get(_i.registers, _l[i]);
+				}
 			}
 			return _i.run(_l);
 		}
@@ -855,9 +897,35 @@ new RunGML_Op ("reference",
             - For example, the following two programs are functionally equivalent:
                 - ['r', 'add', 'foo', 'bar']
                 - ['add', ['v', 'foo'], ['v', 'bar']]
-            - They will return the sum of the values in registers foo' and 'bar'.
-    - args: [index] or [operator, index0, index1, ...]
-    - output: [value] or the rusult of applying the named operator"
+            - They will return the sum of the values in registers 'foo' and 'bar'.
+    - args: [(operator), (register_name, ...)]
+    - output: *"
+)
+
+new RunGML_Op ("reference_parent",
+	function(_i, _l) {
+		if array_length(_l) == 0 return variable_instance_get_names(_i.parent);
+		if struct_exists(_i.ops, _l[0]) {
+			for (var i=1; i<array_length(_l); i++) {
+				if variable_instance_exists(_i.parent, _l[i]) {
+					_l[i] = variable_instance_get(_i.parent, _l[i]);
+				}
+			}
+			return _i.run(_l);
+		}
+		else return undefined;
+	},	
+@"Similar to the 'reference' ('r') operator, but substitutes with values from the parent's instance variables.  Behavior depends on the number of arguments:
+        - 0: Return the names of all parent instance variables
+        - 1+: If the first argument names an operator:
+            - Substitute any other arguments that name parent instance variables with their values
+            - Run the first-argument operator on the resulting list of substituted arguments.
+            - For example, the following two programs are functionally equivalent:
+                - ['rp', 'add', 'foo', 'bar']
+                - ['add', ['p', 'foo'], ['p', 'bar']]
+            - They will return the sum of the values in parent instance variables 'foo' and 'bar'.
+    - args: [(operator), (variable, ...)]
+    - output: *"
 )
 	
 new RunGML_Op("global",
@@ -1016,6 +1084,26 @@ new RunGML_Op("add",
 	[
 		new RunGML_Constraint_ArgCount("geq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
+	]
+)
+
+new RunGML_Op("inc",
+	function(_i, _l) {
+		// a, b
+		if struct_exists(_i.registers, _l[0]) {
+			struct_set(_i.registers, _l[0], struct_get(_i.registers, _l[0]) + _l[1])
+		} else {
+			struct_set(_i.registers, _l[0], _l[1]);
+		}
+		return [];
+	},
+@"Increment a variable by some amount.  If the variable is undefined, set it to that amount.
+    - args: [register_name, number]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("eq", 2),
+		new RunGML_Constraint_ArgType(0, ["string", "number", "int32", "int64"]),
+		new RunGML_Constraint_ArgType(1, "numeric")
 	]
 )
 	
@@ -1284,6 +1372,8 @@ new RunGML_Op("approach",
 	]
 )
 
+
+
 #endregion Math
 	
 #region Objects
@@ -1351,7 +1441,7 @@ new RunGML_Op("and",
 	function(_i, _l) {
 		return _l[0] and _l[1];	
 	},
-@"Returns true iff both arguments are true
+@"Logical and operator
     - args: [A, B]
     - output: A and B"
 )
@@ -1360,7 +1450,7 @@ new RunGML_Op("or",
 	function(_i, _l) {
 		return _l[0] or _l[1];	
 	},
-@"Returns true if either argument is true
+@"Logical or operator
     - args: [A, B]
     - output: [(A or B)]"
 )
@@ -1369,7 +1459,7 @@ new RunGML_Op("not",
 	function(_i, _l) {
 		return not _l[0];
 	},
-@"Returns the inverse of the argument's boolean value
+@"Return the inverse of the argument's boolean value
     - args: [A]
     - output: [!A]"
 )
@@ -1378,16 +1468,25 @@ new RunGML_Op("eq",
 	function(_i, _l) {
 		return _l[0] == _l[1];	
 	},
-@"Returns true iff the two arguments are equal
+@"Check whether two arguments are equivalent
     - args: [A, B]
     - output: [(A == B)]"
+)
+
+new RunGML_Op("neq",
+	function(_i, _l) {
+		return _l[0] != _l[1];	
+	},
+@"Check whether two arguments are not equal (inverse of 'eq')
+    - args: [A, B]
+    - output: [(A != B)]"
 )
 	
 new RunGML_Op("lt",
 	function(_i, _l) {
 		return _l[0] < _l[1];	
 	},
-@"Returns true iff the first argument is less than the second
+@"Check whether the first argument is less than the second
     - args: [A, B]
     - output: [(A < B)]"
 )
@@ -1396,7 +1495,7 @@ new RunGML_Op("gt",
 	function(_i, _l) {
 		return _l[0] > _l[1];	
 	},
-@"Returns true iff the first argument is greater than the second
+@"Check whether the first argument is greater than the second
     - args: [A, B]
     - output: [(A > B)]"
 )
@@ -1405,7 +1504,7 @@ new RunGML_Op("leq",
 	function(_i, _l) {
 		return _l[0] <= _l[1];	
 	},
-@"Returns true iff the first argument is less than or equal to the second
+@"Check whether the first argument is less than or equal to the second
     - args: [A, B]
     - output: [(A <= B)]"
 )
@@ -1414,18 +1513,9 @@ new RunGML_Op("geq",
 	function(_i, _l) {
 		return _l[0] >= _l[1];	
 	},
-@"Returns true iff the first argument is greater than or equal to the second
+@"Check whether the first argument is greater than or equal to the second
     - args: [A, B]
     - output: [(A >= B)]"
-)
-	
-new RunGML_Op("neq",
-	function(_i, _l) {
-		return _l[0] != _l[1];	
-	},
-@"Returns true iff the two arguments are not equal
-    - args: [A, B]
-    - output: [(A != B)]"
 )
 
 #endregion Logic
@@ -1448,6 +1538,37 @@ new RunGML_Op("room_h",
 		return room_height;
 	},
 @"Returns the height of the current room.
+    - args: []
+    - output: [height]"
+)
+
+new RunGML_Op("room",
+	function(_i, _l=[]) {
+		switch(array_length(_l)) {
+			case 0:
+				return room_get_name(room);
+				break;
+			case 1:
+				var _room = asset_get_index(_l[0]);
+				if !room_exists(_room) return -1;
+				room_goto(_room);
+				return [];
+				break;
+		}
+	},
+@"Behavior depends on the number of arguments:
+        - 0: Return the name of the current room
+		- 1: Go to the named room, if it exists
+    - args: [(room_name)]
+    - output: [(room_name)]"
+)
+
+new RunGML_Op("room_next",
+	function(_i, _l=[]) {
+		room_goto_next();
+		return [];
+	},
+@"Go to the next room.
     - args: []
     - output: [height]"
 )
@@ -1492,6 +1613,22 @@ new RunGML_Op("fullscreen",
 	
 #region Drawing
 
+new RunGML_Op("draw_text",
+	function(_i, _l) {
+		// x, y, string
+		draw_text(_l[0], _l[1], _l[2]);
+	},
+@"Draw text
+    - args: [x, y, string]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("eq", 3),
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "string")
+	]
+)
+
 new RunGML_Op("draw_sprite",
 	function(_i, _l) {
 		// sprite, frame, x, y
@@ -1512,6 +1649,81 @@ new RunGML_Op("draw_sprite_general",
     - output: []"
 )
 
+new RunGML_Op("draw_circle",
+	function(_i, _l) {
+		var _r = 1;
+		var _outline = false;
+		var _c_center = draw_get_color();
+		var _c_edge = _c_center;
+		var _n_args = array_length(_l)
+		if _n_args > 2 {
+			_r = _l[2]
+			if _n_args > 3 {
+				_outline = _l[3]
+				if _n_args > 4 {
+					_c_center = _l[4]
+					if _n_args > 5 {
+						_c_edge = _l[5]
+					} else {
+						_c_edge = _l[4]
+					}
+				}
+			}
+		}
+		draw_circle_color(_l[0], _l[1], _r, _c_center, _c_edge, _outline);
+	},
+@"Draw a circle
+    - args: [x, y, (r=1), (outline=false), (c_center=draw_color), (c_edge=draw_color)]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("in", [3, 4, 5, 6]),
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "numeric", false),
+		new RunGML_Constraint_ArgType(3, "bool", false),
+		new RunGML_Constraint_ArgType(3, "bool", false),
+	]
+)
+
+new RunGML_Op("draw_rect",
+	function(_i, _l) {
+		var _outline = false;
+		var _c1, _c2, _c3, _c4 = draw_get_color()
+		var _n_args = array_length(_l)
+		if _n_args > 4 {
+			_outline = _l[4]
+			if _n_args > 5 {
+				_c1 = _l[5];
+				if _n_args > 6 {
+					_c2 = _l[6];
+					_c3 = _l[7];
+					_c4 = _l[8];
+				} else {
+					_c2 = _c1;
+					_c3 = _c1;
+					_c4 = _c1;
+				}
+			}
+		}
+		draw_rectangle_color(_l[0], _l[1], _l[2], _l[3], _c1, _c2, _c3, _c4, _outline)
+	},
+@"Draw a rectangle
+    - args: [x1, y1, x2, y2, (outline=false), (c1=draw_color), (c2=c1, c3=c1, c4=c1)]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("in", [4, 5, 6, 9]),
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "numeric"),
+		new RunGML_Constraint_ArgType(3, "numeric"),
+		new RunGML_Constraint_ArgType(4, "bool", false),
+		new RunGML_Constraint_ArgType(5, "numeric", false),
+		new RunGML_Constraint_ArgType(6, "numeric", false),
+		new RunGML_Constraint_ArgType(7, "numeric", false),
+		new RunGML_Constraint_ArgType(8, "numeric", false),
+	]
+)
+
 new RunGML_Op("draw_color",
 	function(_i, _l) {
 		if array_length(_l) < 1 return draw_get_color();
@@ -1520,7 +1732,8 @@ new RunGML_Op("draw_color",
 	},
 @"Get or set the draw color.
     - args: [(color)]
-    - output: (color)"
+    - output: (color)",
+	[new RunGML_Constraint_ArgType(0, "numeric", false)]
 )
 	
 new RunGML_Op("draw_alpha",
@@ -1531,7 +1744,8 @@ new RunGML_Op("draw_alpha",
 	},
 @"Get or set the draw alpha.
     - args: [(alpha)]
-    - output: (alpha)"
+    - output: (alpha)",
+	[new RunGML_Constraint_ArgType(0, "numeric", false)]
 )
 	
 new RunGML_Op("draw_halign",
@@ -1611,10 +1825,38 @@ new RunGML_Op("hsv",
     - args: [hue, saturation, value]
     - output: color"
 )
+
+new RunGML_Op("color",
+	function(_i, _l) {
+		var _color;
+		if struct_exists(global.RunGML_Colors, _l[0]) {
+			_color = struct_get(global.RunGML_Colors, _l[0])
+		} else if string_length(_l[0]) == 6 {
+			var _r = string_concat("0x", string_char_at(_l[0], 1), string_char_at(_l[0], 2))
+			var _g = string_concat("0x", string_char_at(_l[0], 3), string_char_at(_l[0], 4))
+			var _b = string_concat("0x", string_char_at(_l[0], 5), string_char_at(_l[0], 6))
+			_color =  make_color_rgb(real(_r), real(_g), real(_b));
+		}
+		return _color;
+	}, 
+@"Create a color by name or hex code
+    - args: [string]
+    - output: color",
+	[new RunGML_Constraint_ArgType(0, "string")]
+)
 	
 #endregion Drawing
 
-#region Misc
+#region Time
+new RunGML_Op("delta",
+	function(_i, _l) {
+		return delta_time / 1000000.0;
+	},
+@"Return the time elapsed since the previous frame in seconds
+    - args: []
+    - output: number"
+)
+
 new RunGML_Op("fps",
 	function(_i, _l) {
 		return fps;
@@ -1644,6 +1886,10 @@ new RunGML_Op("game_speed",
     - args: [(game_speed)]
     - output: (game_speed)"
 )
+
+#endregion Time
+
+#region Misc
 
 new RunGML_Op("nth",
 	function(_i, _l) {
@@ -1685,10 +1931,15 @@ new RunGML_Op ("test_constant", 23);
 #endregion Misc
 
 #region Aliases
+RunGML_alias("c", "console");
 RunGML_alias("g", "global");
-RunGML_alias("r", "reference");
-RunGML_alias("v", "var");
+RunGML_alias("p", "parent");
 RunGML_alias("q", "quit");
+RunGML_alias("r", "reference");
+RunGML_alias("rp", "reference_parent");
+RunGML_alias("t", "this");
+RunGML_alias("v", "var");
+
 RunGML_alias("multiply", "mult");
 RunGML_alias("subtract", "sub");
 RunGML_alias("divide", "div");

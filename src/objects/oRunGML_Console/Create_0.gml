@@ -40,6 +40,7 @@ line_bg_color = c_black;
 line_bg_alpha = 0.75;
 history_bg_color = c_dkgrey;
 history_bg_alpha = 0.75;
+font = global.RunGML_Console_font;
 
 alphabet = [
 	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
@@ -50,9 +51,6 @@ alphabet = [
 	"!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", 
 	",", ".", "/", "<", ">", "?", " ", ":", ";", "'", "[", "]", "'", "\"", "{", "}"
 ];
-
-text_x = 0;
-text_y = display_get_gui_height();
 
 toggle = function(_set=!enabled) {
 	enabled = _set;
@@ -100,36 +98,51 @@ trim_numeric_string = function(_s) {
 	return _s;
 }
 
-wrap_string = function(_s, _w=250, _sep=[" ", ",", "-", "_", ")", "]", "}", "\n"]) {
-	var _wrapped, _last, _len, _portion, _remaining, _s_line, _char, _done;
-	var _lines = string_split(_s, "\n");
-	
-	for (var _line=0; _line<array_length(_lines); _line++) {
-		_wrapped = "";
-		_s_line = _lines[_line];
-		_done = false
-		while not _done {
-			_last = noone;
-			for (var i=1; i<=_w; i++) {
-				if i > string_length(_s_line) _last = i-1;
-				_char = string_char_at(_s_line, i);
-				if array_contains(_sep, _char) _last = i;
-			}
-			if _last == noone _last = _w;
-			_portion = string_copy(_s_line, 1, _last)
-			_remaining = string_length(_s_line) - string_length(_portion)
-			if string_length(_wrapped) > 0 _wrapped += "\n";
-			_wrapped += _portion;
-			if _remaining == 0 {
-				_done = true;
-				continue
-			}
-			_s = string_copy(_s, _last+1, _remaining);	
-		}
-		_lines[_line] = _wrapped;
+wrap_string = function(_s, _w=undefined) {
+	if is_undefined(_w) _w = display_get_gui_width();
+	var _char_w = string_width("_");
+	var _chars_per_line = floor(_w/_char_w)
+	var _start_len = string_length(_s);
+	var _i = _chars_per_line;
+	var _added = 0;
+	while _i <= _start_len + _added {
+		_s = string_insert("\n", _s, _i);
+		_added += 1
+		_i += _chars_per_line + _added;
 	}
-	return string_join_ext("\n", _lines);
+	return _s;
 }
+
+//wrap_string = function(_s, _w=250, _sep=[" ", ",", "-", "_", ")", "]", "}", "\n"]) {
+//	var _wrapped, _last, _len, _portion, _remaining, _s_line, _char, _done;
+//	var _lines = string_split(_s, "\n");
+	
+//	for (var _line=0; _line<array_length(_lines); _line++) {
+//		_wrapped = "";
+//		_s_line = _lines[_line];
+//		_done = false
+//		while not _done {
+//			_last = noone;
+//			for (var i=1; i<=_w; i++) {
+//				if i > string_length(_s_line) _last = i-1;
+//				_char = string_char_at(_s_line, i);
+//				if array_contains(_sep, _char) _last = i;
+//			}
+//			if _last == noone _last = _w;
+//			_portion = string_copy(_s_line, 1, _last)
+//			_remaining = string_length(_s_line) - string_length(_portion)
+//			if string_length(_wrapped) > 0 _wrapped += "\n";
+//			_wrapped += _portion;
+//			if _remaining == 0 {
+//				_done = true;
+//				continue
+//			}
+//			_s = string_copy(_s, _last+1, _remaining);	
+//		}
+//		_lines[_line] = _wrapped;
+//	}
+//	return string_join_ext("\n", _lines);
+//}
 
 exec_line = function(_l) {
 	var _output = RunGMLI.run(json_parse(string("[{0}]", _l)))
@@ -150,16 +163,6 @@ backspace = function() {
 		cursor_pos -= 1;
 	}
 }
-
-//wrap_string = function(_s, _w=60) {
-//	var _count = 0;
-//	var _safe = 1;
-//	var _delimiters = [" ", ","]
-//	for (var i=0; i<string_length(_s), i++) {
-//		if array_contains(_delimiters, _s[i]) {
-//		}
-//	}
-//}
 
 
 

@@ -12,14 +12,17 @@ global.RunGML_Console_toggleKey = vk_f9;
 	
 // Set the number of decimal places to display for floating point numbers in the console
 global.RunGML_Console_floatPrecision = 8;
+
+//global.RunGML_Console_font = font_add_sprite(sprRunGML_Font_Pixel, ord("!"), false, 2);
+global.RunGML_Console_font = fntRunGML_Console;
 	
-// Allow the operator definitions below to overwrite any built-ins with the same name?
-global.RunGML_Config_overwrite = true; 
+// Allow new operator definitions to overwrite existing ones?
+global.RunGML_overwriteOps = true;
 
 // Throw errors instead of just printing debug messages?
 // Sets default behavior, can be changed for specific interpreter instances.
-// The console interpreter throws to its display.
-global.RunGML_throwErrors = true;
+// The console interpreter will throw to its display regardless.
+global.RunGML_throwErrors = false;
 
 
 // Define your own operators and aliases inside this function
