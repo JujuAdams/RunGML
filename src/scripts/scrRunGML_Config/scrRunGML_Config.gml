@@ -15,6 +15,9 @@ global.RunGML_Console_floatPrecision = 8;
 
 //global.RunGML_Console_font = font_add_sprite(sprRunGML_Font_Pixel, ord("!"), false, 2);
 global.RunGML_Console_font = fntRunGML_Console;
+
+//global.RunGML_Console_font = font_add_sprite(sprRunGML_Font_Pixel, ord("!"), false, 2);
+global.RunGML_Console_scale = 1.0;
 	
 // Allow new operator definitions to overwrite existing ones?
 global.RunGML_overwriteOps = true;
@@ -25,7 +28,7 @@ global.RunGML_overwriteOps = true;
 global.RunGML_throwErrors = false;
 
 
-// Define your own operators and aliases inside this function
+// Define your own operators, aliases, and colors inside this function
 function RunGML_ConfigOps() {
 	/*An operator definition has the following parameters:
 		- A name
@@ -44,8 +47,11 @@ function RunGML_ConfigOps() {
 	)
 
 	// Operators can also define constants instead of functions
-	new RunGML_Op("test_constant", 42, "42");
+	new RunGML_Op("test_constant", 42);
 
 	// You can also define aliases for operators
 	RunGML_alias("test_alias", "test_operator")
+	
+	// And define new color names for use with the "color" operator
+	RunGML_color("seafoam", #78aa9f)
 }

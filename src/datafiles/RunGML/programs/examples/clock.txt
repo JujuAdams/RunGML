@@ -1,0 +1,31 @@
+["object", 0, 0, "Instances", {
+	"create": ["pass",
+		["v", "visible", 1],
+		["v", "t", 0],
+		["v", "frame", 0],
+		["v", "x", 8],
+		["v", "y", 8],
+		["v", "text_color", ["color", "white"]],
+		["v", "text", ""]
+	],
+	"step": ["pass",
+		["inc", "t", ["delta"]],
+		["inc", "frame", 1],
+		["v", "frame", ["mod", ["v", "frame"], ["max", 1, ["fps"]]]],
+		["v", "text", ["string",
+			"Time (s): {0}\n   Frame: {1}/{2}\n Max FPS: {3}",
+			["v", "t"],
+			["v", "frame"],
+			["fps"],
+			["fps_real"]
+		]],
+	],
+	"draw": ["pass",
+		["if", ["v", "visible"], {"true": ["pass",
+			["draw_color", ["v", "text_color"]],
+			["draw_halign", "left"],
+			["draw_valign", "top"],
+			["r", "draw_text", "x", "y", "text"]
+		]}]
+	]
+}]

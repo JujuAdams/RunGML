@@ -1,5 +1,5 @@
-#macro RunGML_version "2025_03_23_00"
-#macro RunGML_homepage "https://github.com/sdelaughter/RunGML"
+#macro RunGML_Version "2025_03_23_00"
+#macro RunGML_Homepage "https://github.com/sdelaughter/RunGML"
 
 global.RunGML_Colors = {
 	"aqua": c_aqua,
@@ -23,7 +23,7 @@ global.RunGML_Colors = {
 	"silver": c_silver,
 	"teal": c_teal,
 	"white": c_white,
-	"yellow": c_yellow
+	"yellow": c_yellow,
 }
 
 function RunGML_Interpreter(_name="RunGML_I") constructor {
@@ -134,6 +134,7 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true): 
 	types = _types;
 	required = _required
 	if types == "numeric" types = ["number", "int32", "int64"];
+	if types == "alphanumeric" types = ["string", "number", "int32", "int64"];
 	if typeof(types) != "array" types = [types];
 	doc = function() {
 		var _docstring = string("typeof(args[{0}]) in {1}", index, types)
@@ -187,6 +188,7 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 		var _docstring = string(@"- {0}", name);
 		if array_length(aliases) > 0 _docstring += string("\n    - aliases: {0}", aliases)
 		_docstring += string("\n    - desc: {0}", desc);
+		if typeof(f) != "method" _docstring += " (constant)"
 		var _n_constraints = array_length(constraints);
 		if _n_constraints > 0 {
 			_docstring += "\n    - constraints:";
@@ -265,6 +267,10 @@ function RunGML_clone(_l) {
 	return json_parse(json_stringify(_l));	
 }
 
+function RunGML_color(_name, _color) {
+	struct_set(global.RunGML_Colors	, _name, _color)
+}
+
 /* Operator Definitions
 Additional operators should be defined in scrRunGML_Config
 Make a backup of that file before updating RunGML
@@ -276,7 +282,7 @@ global.RunGML_Aliases = {}
 
 #region Constants
 
-new RunGML_Op("version", RunGML_version,
+new RunGML_Op("version", RunGML_Version,
 @"Returns the RunGML version number
     - args: []
     - output: string",
@@ -345,7 +351,7 @@ new RunGML_Op ("phi", (1+sqrt(5))/2.0,
 
 new RunGML_Op("update",
 	function(_i, _l=[]) {
-		url_open(RunGML_homepage);
+		url_open(RunGML_Homepage);
 		return [];
 	},
 @"Returns the RunGML web address
@@ -423,7 +429,7 @@ Run ["help", "some_operator_name"] to get documentation on a specific operator.
 Run ["manual"] to generate full documentation for all operators.
 ', 
 					["version"],
-					["global", "RunGML_homepage"],
+					RunGML_Homepage,
 					["op_count"],
 				]
 			)
@@ -997,8 +1003,7 @@ new RunGML_Op("struct",
 				break;
 		}
 	},
-@"Create, read, or modify a struct.
-Behavior depends on the number of arguments:
+@"Create, read, or modify a struct. Behavior depends on the number of arguments:
         - 0: return an empty struct
         - 1: returns {'struct': arg0}
         - 2: returns get_struct(arg0, arg1)
@@ -1048,6 +1053,22 @@ new RunGML_Op("array",
         - 3: sets arg0[arg1] = arg2;
     - args: [(array), (index), (value)]
     - output: [*]"
+)
+
+new RunGML_Op("array_get",
+	function(_i, _l) {
+		if (_l[1] < 0) or (_l[1] >= array_length(_l[0])) return undefined;
+		var _arr = _l[0];
+		var _index = _l[1];
+		return _arr[_index];
+	},
+@"Return a value from an array by index.
+    - args: [array, index]
+    - output: value",
+	[
+		new RunGML_Constraint_ArgType(0, "array"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+	]
 )
 	
 new RunGML_Op("len",
@@ -1102,7 +1123,27 @@ new RunGML_Op("inc",
     - output: []",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
-		new RunGML_Constraint_ArgType(0, ["string", "number", "int32", "int64"]),
+		new RunGML_Constraint_ArgType(0, "alphanumeric"),
+		new RunGML_Constraint_ArgType(1, "numeric")
+	]
+)
+
+new RunGML_Op("dec",
+	function(_i, _l) {
+		// a, b
+		if struct_exists(_i.registers, _l[0]) {
+			struct_set(_i.registers, _l[0], struct_get(_i.registers, _l[0]) - _l[1])
+		} else {
+			struct_set(_i.registers, _l[0], _l[1]);
+		}
+		return [];
+	},
+@"Decrement a variable by some amount.  If the variable is undefined, set it to that amount.
+    - args: [register_name, number]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("eq", 2),
+		new RunGML_Constraint_ArgType(0, "alphanumeric"),
 		new RunGML_Constraint_ArgType(1, "numeric")
 	]
 )
@@ -1301,18 +1342,6 @@ new RunGML_Op("abs",
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
 )
-
-new RunGML_Op("abs",
-	function(_i, _l) {
-		return abs(_l[0]);
-	},
-@"Returns the absolute value of a number
-    - args: [number]
-    - output: abs(number)",
-	[
-		new RunGML_Constraint_ArgType(0, "numeric")
-	]
-)
 	
 new RunGML_Op("clamp",
 	function(_i, _l) {
@@ -1372,7 +1401,76 @@ new RunGML_Op("approach",
 	]
 )
 
+new RunGML_Op("rand",
+	function(_i, _l) {
+		var _min = 0;
+		var _max = 1;
+		if array_length(_l) == 1 _max = _l[0]
+		else if array_length(_l) == 2 {
+			_min = _l[0]
+			_max = _l[1]
+		}
+		return random_range(_min, _max);
+	},
+@"Return a random value.  Behavior depends on the number of arguments:
+        - 0: Return a value between 0 and 1 (inclusive)
+		- 1: Return a value between 0 and arg0 (inclusive)
+		- 2: Return a value between arg0 and arg1 (inclusive)
+    - args: [(max=1)]
+    - output: number",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric", false),
+		new RunGML_Constraint_ArgType(1, "numeric", false),
+	]
+)
+new RunGML_Op("rand_int",
+	function(_i, _l) {
+		var _min = 0;
+		var _max = 1;
+		if array_length(_l) == 1 _max = _l[0]
+		else if array_length(_l) == 2 {
+			_min = _l[0]
+			_max = _l[1]
+		}
+		return irandom_range(_min, _max);
+	},
+@"Return a random integer.  Behavior depends on the number of arguments:
+        - 0: Return either 0 or 1
+		- 1: Return an integer between 0 and arg0 (inclusive)
+		- 2: Return an integer between arg0 and arg1 (inclusive)
+    - args: [(max=1)]
+    - output: number",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric", false),
+		new RunGML_Constraint_ArgType(1, "numeric", false),
+	]
+)
 
+new RunGML_Op("rand_seed",
+	function(_i, _l) {
+		if array_length(_l) > 0 random_set_seed(_l[0]);
+		else randomise();
+	},
+@"Return a random value between 0 and some upper limit (defaults to 1).  Inclusive on both ends.
+    - args: [(max=1)]
+    - output: number",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric", false)
+	]
+)
+
+new RunGML_Op("choose",
+	function(_i, _l) {
+		var _index = irandom_range(0, array_length(_l[0])-1);
+		return _l[0][_index]
+	},
+@"Return a random element from a list.
+    - args: [(max=1)]
+    - output: number",
+	[
+		new RunGML_Constraint_ArgType(0, "array")
+	]
+)
 
 #endregion Math
 	
@@ -1397,7 +1495,7 @@ new RunGML_Op("object",
 		new RunGML_Constraint_ArgCount("eq", 4),
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "numeric"),
-		new RunGML_Constraint_ArgType(2, ["string", "number", "int32", "int64"]),
+		new RunGML_Constraint_ArgType(2, "alphanumeric"),
 		new RunGML_Constraint_ArgType(3, "struct")
 	]
 )
@@ -1405,10 +1503,13 @@ new RunGML_Op("object",
 new RunGML_Op("create",
 	function(_i, _l) {
 		// x, y, layer, object_index
+		if typeof(_l[3]) == "string" {
+			_l[3] = asset_get_index(_l[3])
+		}
 		if typeof(_l[2]) == "string" {
-			return instance_create_layer(_l[0], _l[1], _l[2], asset_get_index(_l[3]));
+			return instance_create_layer(_l[0], _l[1], _l[2], _l[3]);
 		} else {
-			return instance_create_depth(_l[0], _l[1], _l[2], asset_get_index(_l[3]));
+			return instance_create_depth(_l[0], _l[1], _l[2], _l[3]);
 		}
 	},
 @"Create a new object instance
@@ -1419,8 +1520,8 @@ new RunGML_Op("create",
 		new RunGML_Constraint_ArgCount("eq", 4),
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "numeric"),
-		new RunGML_Constraint_ArgType(2, ["string", "number", "int32", "int64"]),
-		new RunGML_Constraint_ArgType(3, "string")
+		new RunGML_Constraint_ArgType(2, "alphanumeric"),
+		new RunGML_Constraint_ArgType(3, "alphanumeric")
 	]
 )
 	
@@ -1649,6 +1750,53 @@ new RunGML_Op("draw_sprite_general",
     - output: []"
 )
 
+new RunGML_Op("draw_point",
+	function(_i, _l) {
+		if array_length(_l) > 2 {
+			var _c = draw_get_color
+			draw_set_color(_l[2]);
+			draw_point(_l[0], _l[1])
+			draw_set_color(_c);
+		} else draw_point(_l[0], _l[1]);
+	},
+@"Draw a point
+    - args: [x, y, (color)]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "numeric", false),
+	]
+)
+
+new RunGML_Op("draw_line",
+	function(_i, _l) {
+		var _c_center = draw_get_color();
+		var _c_edge = _c_center;
+		var _n_args = array_length(_l)
+		if _n_args > 4 {
+			_c_center = _l[4]
+			if _n_args > 5 {
+				_c_edge = _l[5]
+			} else {
+				_c_edge = _c_center
+			}
+		}
+		draw_line_color(_l[0], _l[1], _l[2], _l[3], _c_center, _c_edge);
+	},
+@"Draw a line
+    - args: [x1, y1, x2, y2, (color), (color2)]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "numeric"),
+		new RunGML_Constraint_ArgType(3, "numeric"),
+		new RunGML_Constraint_ArgType(4, "numeric", false),
+		new RunGML_Constraint_ArgType(5, "numeric", false),
+	]
+)
+
 new RunGML_Op("draw_circle",
 	function(_i, _l) {
 		var _r = 1;
@@ -1665,7 +1813,7 @@ new RunGML_Op("draw_circle",
 					if _n_args > 5 {
 						_c_edge = _l[5]
 					} else {
-						_c_edge = _l[4]
+						_c_edge = _c_center
 					}
 				}
 			}
@@ -1681,7 +1829,41 @@ new RunGML_Op("draw_circle",
 		new RunGML_Constraint_ArgType(1, "numeric"),
 		new RunGML_Constraint_ArgType(2, "numeric", false),
 		new RunGML_Constraint_ArgType(3, "bool", false),
-		new RunGML_Constraint_ArgType(3, "bool", false),
+		new RunGML_Constraint_ArgType(4, "bool", false),
+	]
+)
+
+new RunGML_Op("draw_ellipse",
+	function(_i, _l) {
+		var _outline = false;
+		var _c_center = draw_get_color();
+		var _c_edge = _c_center;
+		var _n_args = array_length(_l)
+		if _n_args > 4 {
+			_outline = _l[4]
+			if _n_args > 5 {
+				_c_center = _l[5]
+				if _n_args > 6 {
+					_c_edge = _l[6]
+				} else {
+					_c_edge = _c_center
+				}
+			}
+		}
+		draw_ellipse_color(_l[0], _l[1], _l[2], _l[3], _c_center, _c_edge, _outline);
+	},
+@"Draw an ellipse
+    - args: [x1, y1, x2, y2, (outline=false), (c_center=draw_color), (c_edge=draw_color)]
+    - output: []",
+	[
+		new RunGML_Constraint_ArgCount("in", [3, 4, 5, 6]),
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "numeric"),
+		new RunGML_Constraint_ArgType(3, "numeric"),
+		new RunGML_Constraint_ArgType(4, "bool", false),
+		new RunGML_Constraint_ArgType(5, "numeric", false),
+		new RunGML_Constraint_ArgType(6, "numeric", false),
 	]
 )
 
@@ -1844,6 +2026,42 @@ new RunGML_Op("color",
     - output: color",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
+
+new RunGML_Op("color_merge",
+	function(_i, _l) {
+		return merge_color(_l[0], _l[1], _l[2]);
+	},
+@"Merge two colors by some amount
+    - args: [color1, color2, fraction]
+    - output: color3",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric"),
+		new RunGML_Constraint_ArgType(2, "numeric")
+	]
+)
+
+new RunGML_Op("color_rand",
+	function(_i, _l) {
+		return random_range(0, 16777216);
+	},
+@"Create a random color
+    - args: []
+    - output: color",
+)
+
+new RunGML_Op("color_inv",
+	function(_i, _l) {
+		//return 16777216 - _l[0];
+		var _r = color_get_red(_l[0]);
+		var _g = color_get_green(_l[0]);
+		var _b = color_get_blue(_l[0]);
+		return make_color_rgb(255-_r, 255-_g, 255-_b);
+	},
+@"Create a random color
+    - args: []
+    - output: color",
+)
 	
 #endregion Drawing
 
@@ -1895,16 +2113,18 @@ new RunGML_Op("nth",
 	function(_i, _l) {
 		switch(_l[0] mod 10){
 			case 1:
-				return "st"
+				return "st";
 			case 2:
-				return "nd"
+				return "nd";
+			case 3:
+				return "rd";
 			default:
-				return "rd"
+				return "th";
 		}
 	},
 @"Get the ordinal suffix for a given number ()
     - args: [number]
-    - output: 'st', 'nd', or 'rd'"
+    - output: 'st', 'nd', 'rd', or 'th'"
 )
 	
 new RunGML_Op("quit",
@@ -1915,6 +2135,66 @@ new RunGML_Op("quit",
 @"Quit the game
     - args: []
     - output: []"
+)
+
+new RunGML_Op("asset",
+	function(_i, _l) {
+		return asset_get_index(_l[0])
+	},
+@"Return the index of the named asset
+    - args: [asset_name]
+    - output: index",
+	[new RunGML_Constraint_ArgType(0, "string")]
+)
+
+new RunGML_Op("cursor",
+	function(_i, _l) {
+		return [mouse_x, mouse_y]
+	},
+@"Return the cursor's coordinates
+    - args: []
+    - output: [mouse_x, mouse_y]"
+)
+
+new RunGML_Op("near_cursor",
+	function(_i, _l) {
+		var _obj = all;
+		if array_length(_l) > 0 {
+			if typeof(_l[0]) == "string" _obj = asset_get_index(_l[0])
+			else _obj = _l[0];
+		}
+		return instance_nearest(mouse_x, mouse_y, _obj);
+	},
+@"Return index of instance nearest to the mouse.  Optional argument specifies an object index or asset name.
+    - args: [(object_index/asset_name)]
+    - output: index",
+	[new RunGML_Constraint_ArgType(0, "alphanumeric", false)]
+)
+
+new RunGML_Op("near",
+	function(_i, _l) {
+		var _x = mouse_x;
+		var _y = mouse_y;
+		var _obj = all;
+		if array_length(_l) > 0 {
+			_x = _l[0];
+		} if array_length(_l) > 1 {
+			_y = _l[1];
+		}
+		if array_length(_l) > 2 {
+			if typeof(_l[2]) == "string" _obj = asset_get_index(_l[0])
+			else _obj = _l[2];
+		}
+		return instance_nearest(_x, _y, _obj);
+	},
+@"Return index of instance (arg2) nearest to some coordinates (arg0, arg1).
+    - args: [(x=mouse_x), (y=mouse_y), (obj=any)]
+    - output: index",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric", false),
+		new RunGML_Constraint_ArgType(0, "numeric", false),
+		new RunGML_Constraint_ArgType(0, "alphanumeric", false)
+	]
 )
 
 new RunGML_Op("rickroll",
@@ -1931,8 +2211,10 @@ new RunGML_Op ("test_constant", 23);
 #endregion Misc
 
 #region Aliases
-RunGML_alias("c", "console");
+// "e" reserved for mathematical constant
 RunGML_alias("g", "global");
+RunGML_alias("i", "inst");
+RunGML_alias("o", "object");
 RunGML_alias("p", "parent");
 RunGML_alias("q", "quit");
 RunGML_alias("r", "reference");

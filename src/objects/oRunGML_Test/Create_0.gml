@@ -52,6 +52,9 @@ with(RunGMLI) {
 	//// Display a frame counter
 	//run(["runfile", "RunGML/examples/counter.txt"]);
 	
-	// Create a RunGML console
-	run(["console"]);
+	// Create a clock
+	run(["example", "clock"]);
+	
+	// Create a bouncer
+	run(["example", "bounce"]);
 }

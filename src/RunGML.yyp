@@ -18,6 +18,7 @@
   ],
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"bounce.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"bounce.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"clock.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"clock.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"counter.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"counter.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"hello.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"hello.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"math.txt","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"math.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
