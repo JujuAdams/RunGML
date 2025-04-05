@@ -26,7 +26,7 @@ max_history = 20;
 command_history = [];
 command_history_pos = -1;
 command_history_max = 100;
-pause_game = true;
+pause_game = global.RunGML_Console_doPause;
 
 
 text_color = c_lime;
@@ -38,6 +38,9 @@ history_bg_alpha = 0.75;
 font = global.RunGML_Console_font;
 text_scale = global.RunGML_Console_scale;
 
+// Only allow certain characters -- we don't want things like backspace and F-keys
+// TODO: expand to include accents + other scripts (blacklist specials instead?)
+
 alphabet = [
 	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
 	"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
@@ -46,7 +49,7 @@ alphabet = [
 	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "-", "=",
 	"!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", 
 	",", ".", "/", "<", ">", "?", " ", ":", ";", "'", "\"", 
-	"[", "]", "{", "}", "|", "\\"
+	"[", "]", "{", "}", "|", "\\", "\t"
 ];
 
 toggle = function(_set=!enabled) {

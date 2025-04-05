@@ -1,7 +1,14 @@
 if !enabled exit;
+
+var _old_halign = draw_get_halign();
+var _old_valign = draw_get_valign();
+var _old_color = draw_get_color();
+var _old_alpha = draw_get_alpha();
+var _old_font = draw_get_font();
 draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 draw_set_font(font);
+
 var _gui_width = display_get_gui_width();
 var _gui_height = display_get_gui_height();
 
@@ -32,3 +39,10 @@ draw_rectangle_color(_text_x, _history_text_y, _gui_width, _history_text_y+_hist
 draw_set_alpha(text_alpha);
 draw_set_color(text_color);
 draw_text_transformed(_text_x, _history_text_y, _draw_history_text, text_scale, text_scale, 0);
+
+draw_set_halign(_old_halign);
+draw_set_valign(_old_valign);
+draw_set_color(_old_color);
+draw_set_alpha(_old_alpha);
+draw_set_font(_old_font);
+

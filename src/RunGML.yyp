@@ -39,6 +39,7 @@
     {"id":{"name":"oRunGML_SpriteBuilder","path":"objects/oRunGML_SpriteBuilder/oRunGML_SpriteBuilder.yy",},},
     {"id":{"name":"oRunGML_Test","path":"objects/oRunGML_Test/oRunGML_Test.yy",},},
     {"id":{"name":"rRunGML_Test","path":"rooms/rRunGML_Test/rRunGML_Test.yy",},},
+    {"id":{"name":"scrRunGML_Colors","path":"scripts/scrRunGML_Colors/scrRunGML_Colors.yy",},},
     {"id":{"name":"scrRunGML_Config","path":"scripts/scrRunGML_Config/scrRunGML_Config.yy",},},
     {"id":{"name":"scrRunGML","path":"scripts/scrRunGML/scrRunGML.yy",},},
     {"id":{"name":"sprRunGML_Font_Pixel","path":"sprites/sprRunGML_Font_Pixel/sprRunGML_Font_Pixel.yy",},},

@@ -1,30 +1,5 @@
-#macro RunGML_Version "2025_03_23_00"
+#macro RunGML_Version "2025_04_05_00"
 #macro RunGML_Homepage "https://github.com/sdelaughter/RunGML"
-
-global.RunGML_Colors = {
-	"aqua": c_aqua,
-	"black": c_black,
-	"blue": c_blue,
-	"dkgray": c_dkgray,
-	"dkgrey": c_dkgrey,
-	"fuchsia": c_fuchsia,
-	"gray": c_gray,
-	"grey": c_grey,
-	"green": c_green,
-	"lime": c_lime,
-	"ltgray": c_ltgray,
-	"ltgrey": c_ltgrey,
-	"maroon": c_maroon,
-	"navy": c_navy,
-	"olive": c_olive,
-	"orange": c_orange,
-	"purple": c_purple,
-	"red": c_red,
-	"silver": c_silver,
-	"teal": c_teal,
-	"white": c_white,
-	"yellow": c_yellow,
-}
 
 function RunGML_Interpreter(_name="RunGML_I") constructor {
 	name = _name;
@@ -234,6 +209,7 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 }
 
 function RunGML_alias(_nickname, _name, _i = noone) {
+// Create an alias for an operator
 	var _aliases, _ops;
 	if _i == noone {
 		_aliases = global.RunGML_Aliases;
@@ -267,9 +243,12 @@ function RunGML_clone(_l) {
 	return json_parse(json_stringify(_l));	
 }
 
+
 function RunGML_color(_name, _color) {
+// Add a new color definition
 	struct_set(global.RunGML_Colors	, _name, _color)
 }
+
 
 /* Operator Definitions
 Additional operators should be defined in scrRunGML_Config
@@ -813,8 +792,6 @@ new RunGML_Op("repeat",
 )
 
 #endregion Control Flow
-	
-
 	
 #region Debugging
 
@@ -1381,10 +1358,6 @@ new RunGML_Op("map_range",
 		new RunGML_Constraint_ArgType("all", "numeric")
 	]
 )
-
-function map_range(_val, _in_min, _in_max, _out_min, _out_max) {
-  
-}
 	
 new RunGML_Op("approach",
 	function(_i, _l) {
@@ -1929,6 +1902,21 @@ new RunGML_Op("draw_alpha",
     - output: (alpha)",
 	[new RunGML_Constraint_ArgType(0, "numeric", false)]
 )
+
+new RunGML_Op("draw_font",
+	function(_i, _l) {
+		if array_length(_l) < 1 return draw_get_font();
+		if typeof(_l[0]) == "string" {
+			_l[0] = asset_get_index(_l[0]);
+		}
+		draw_set_font(_l[0]);
+		return [];
+	},
+@"Get or set the draw font.
+    - args: [(font)]
+    - output: (font)",
+	[new RunGML_Constraint_ArgCount("leq", 1)]
+)
 	
 new RunGML_Op("draw_halign",
 	function(_i, _l) {
@@ -1988,6 +1976,38 @@ new RunGML_Op("draw_valign",
 @"Get or set the vertical draw alignment
     - args: [(value)]
     - output: (value)"
+)
+
+new RunGML_Op("draw_format",
+	function(_i, _l) {
+		if array_length(_l) < 1 {
+			var _format = [
+				draw_get_font(),
+				draw_get_halign(),
+				draw_get_valign(),
+				draw_get_color(),
+				draw_get_alpha(),
+			]
+			return _format;
+		}
+		else {
+			var _font = _l[0][0];
+			if typeof(_font) == "string" {
+				_font = asset_get_index(_font);
+			}
+			return _i.run(["pass",
+				["draw_font", _font],
+				["draw_halign", _l[0][1]],
+				["draw_valign", _l[0][2]],
+				["draw_color", _l[0][3]],
+				["draw_alpha", _l[0][4]],
+			])
+		}
+	},
+@"Get or set the draw font, h_align, v_align, color, and alpha simultaneously.
+    - args: [([font, h_align, v_align, color, alpha])]
+    - output: ([font, h_align, v_align, color, alpha])",
+	[new RunGML_Constraint_ArgCount("leq", 1)]
 )
 	
 new RunGML_Op("rgb",
@@ -2065,6 +2085,59 @@ new RunGML_Op("color_inv",
 	
 #endregion Drawing
 
+#region Shaders
+
+new RunGML_Op ("shader",
+	function(_i, _l=[]) {
+		switch(array_length(_l)){
+			case 0:
+				shader_current();
+				return [];
+			case 1:
+				var _sh = _l[1];
+				if typeof(_sh) == "string" _sh = asset_get_index(_sh);
+				shader_set(_sh)
+				return []
+		}
+	},
+@"Get or set the current shader. Zero arguments to get, one to set.
+    - args: [(shader)]
+    - output: [(shader)]",
+	[
+		new RunGML_Constraint_ArgType(0, "alphanumeric", false)
+	]
+)
+
+new RunGML_Op ("shader_reset",
+	function(_i, _l=[]) {
+		shader_reset();
+	},
+@"Clear shaders
+    - args: []
+    - output: []"
+)
+
+//new RunGML_Op ("shader_uniform_f",
+//	function(_i, _l=[]) {
+//		var _sh = _l[0]
+//		if typeof(_sh) == "string" _sh = asset_get_index(_sh);
+//		var _u = _l[1]
+//		switch(array_length(_l)){
+//			case 2:
+//				return shader_get_uniform(_sh, _u)
+//			case 3:
+//				switch_typof(
+//				shader_set_uniform_f(_sh, _u, _
+//				return [];
+//		}
+//	},
+//@"Set the current shader.  Pass zero arguments to reset.
+//    - args: [(shader)]
+//    - output: []"
+//)
+
+#endregion Shaders
+
 #region Time
 new RunGML_Op("delta",
 	function(_i, _l) {
@@ -2107,11 +2180,33 @@ new RunGML_Op("game_speed",
 
 #endregion Time
 
+#region Network
+new RunGML_Op("url_open",
+	function(_i, _l=[]) {
+		if string_copy(_l[0], 1, 3) == "www" {
+			_l[0] = string("http://{0}", _l[0])
+		}
+		url_open(_l[0]);
+		return [];
+	},
+@"Open a URL in the default browser
+    - args: [URL]
+    - output: []",
+	[new RunGML_Constraint_ArgType(0, "string")]
+)
+#endregion Network
+
 #region Misc
 
 new RunGML_Op("nth",
 	function(_i, _l) {
-		switch(_l[0] mod 10){
+		var _n = abs(_l[0])
+		var _mod100 = _n mod 100
+		if _mod100 >= 4 and _mod100 <= 20 {
+			return "th";
+		}
+		
+		switch(_n mod 10){
 			case 1:
 				return "st";
 			case 2:
@@ -2122,7 +2217,7 @@ new RunGML_Op("nth",
 				return "th";
 		}
 	},
-@"Get the ordinal suffix for a given number ()
+@"Get the ordinal suffix for a given number
     - args: [number]
     - output: 'st', 'nd', 'rd', or 'th'"
 )

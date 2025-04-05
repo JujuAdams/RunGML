@@ -1,31 +1,39 @@
 ["object", 0, 0, "Instances", {
 	"create": ["pass",
-		["v", "visible", 1],
-		["v", "t", 0],
-		["v", "frame", 0],
-		["v", "x", 8],
-		["v", "y", 8],
-		["v", "text_color", ["color", "white"]],
-		["v", "text", ""]
+		["g", "RunGML_Clock", ["p"]],
+		["p", "visible", 1],
+		["p", "t", 0],
+		["p", "frame", 0],
+		["p", "x", 8],
+		["p", "y", 8],
+		["p", "text_color", ["color", "white"]],
+		["p", "text", ""],
+		["p", "fps_real_slow", ["fps_real"]]
 	],
 	"step": ["pass",
-		["inc", "t", ["delta"]],
-		["inc", "frame", 1],
-		["v", "frame", ["mod", ["v", "frame"], ["max", 1, ["fps"]]]],
-		["v", "text", ["string",
+		["p", "t", ["add", ["p", "t"], ["delta"]]],
+		["p", "frame", ["add", ["p", "frame"], 1]],
+		["p", "frame", ["mod", ["p", "frame"], ["max", 1, ["fps"]]]],
+		["if", ["eq", 0, ["p", "frame"]], {"true": ["pass",
+			["p", "fps_real_slow", ["fps_real"]]
+		]}],
+		["p", "text", ["string",
 			"Time (s): {0}\n   Frame: {1}/{2}\n Max FPS: {3}",
-			["v", "t"],
-			["v", "frame"],
+			["p", "t"],
+			["p", "frame"],
 			["fps"],
-			["fps_real"]
+			["p", "fps_real_slow"]
 		]],
 	],
-	"draw": ["pass",
-		["if", ["v", "visible"], {"true": ["pass",
-			["draw_color", ["v", "text_color"]],
+	"draw_gui": ["pass",
+		["if", ["p", "visible"], {"true": ["pass",
+			["v", "_old_format", ["draw_format"]],
+			["draw_font", "fntRunGML_Console"],
+			["draw_color", ["p", "text_color"]],
 			["draw_halign", "left"],
 			["draw_valign", "top"],
-			["r", "draw_text", "x", "y", "text"]
+			["rp", "draw_text", "x", "y", "text"],
+			["draw_format", ["v", "_old_format"]]
 		]}]
 	]
 }]
