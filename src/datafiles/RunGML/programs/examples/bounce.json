@@ -1,0 +1,70 @@
+["object", 0, 0, 0, {
+	"create": ["pass",
+		["rand_seed"], 
+		["p", "x", ["rand_int", 0, ["display_gui_w"]]],
+		["p", "y", ["rand_int", 0, ["display_gui_h"]]],
+		["p", "r_x", 50],
+		["p", "r_y", 30],
+		["p", "border", 3],
+		["v", "_speed", 300],
+		["v", "_dir", ["add", ["mult", 90, ["choose", ["list", 0, 1, 2, 3]]], ["rand", 30, 60]]],
+		["p", "x_speed", ["r", "lendir_x", "_speed", "_dir"]],
+		["p", "y_speed", ["r", "lendir_y", "_speed", "_dir"]],
+		["p", "color_A", ["color_rand"]],
+		["p", "color_B", ["color_inv", ["p", "color_A"]]],
+		["p", "text", "RunGML"]
+	],
+	"step": ["pass",
+		["p", "x", ["add", ["p", "x"], ["mult", ["delta"], ["p", "x_speed"]]]],
+		["if",
+			["or",
+				["lt", ["p", "x"], 0],
+				["gt", ["p", "x"], ["display_gui_w"]]
+			],{
+				"true": ["pass",
+					["p", "x_speed", ["mult", -1, ["p", "x_speed"]]],
+					["p", "x", ["clamp", ["p", "x"], 0, ["display_gui_w"]]],
+					["p", "color_A", ["color_rand"]],
+					["p", "color_B", ["color_inv", ["p", "color_A"]]]
+			]}
+		],
+		["p", "y", ["add", ["p", "y"], ["mult", ["delta"], ["p", "y_speed"]]]],
+		["if",
+			["or",
+				["lt", ["p", "y"], 0],
+				["gt", ["p", "y"], ["display_gui_h"]]
+			],{
+				"true": ["pass",
+					["p", "y_speed", ["mult", -1, ["p", "y_speed"]]],
+					["p", "y", ["clamp", ["p", "y"], 0, ["display_gui_h"]]],
+					["p", "color_A", ["color_rand"]],
+					["p", "color_B", ["color_inv", ["p", "color_A"]]]
+			]}
+		]
+	],
+	"draw_gui": ["pass",
+		["draw_ellipse", 
+			["sub", ["p", "x"], ["rp", "add", "r_x", "border"]],
+			["sub", ["p", "y"], ["rp", "add", "r_y", "border"]],
+			["add", ["p", "x"], ["rp", "add", "r_x", "border"]],
+			["add", ["p", "y"], ["rp", "add", "r_y", "border"]],
+			["false"],
+			["p", "color_A"]
+		],
+		["draw_ellipse", 
+			["rp", "sub", "x", "r_x"],
+			["rp", "sub", "y", "r_y"],
+			["rp", "add", "x", "r_x"],
+			["rp", "add", "y", "r_y"],
+			["false"],
+			["p", "color_B"]
+		],
+		["v", "_old_format", ["draw_format"]],
+		["draw_color", ["p", "color_A"]],
+		["draw_halign", "center"],
+		["draw_valign", "middle"],
+		["draw_font", "fntRunGML_Console"],
+		["rp", "draw_text", "x", "y", "text"],
+		["r", "draw_format", "_old_format"]
+	]
+}]

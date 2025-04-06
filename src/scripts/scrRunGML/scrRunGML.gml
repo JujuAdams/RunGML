@@ -656,7 +656,7 @@ new RunGML_Op ("runfile",
 new RunGML_Op ("runprog",
 	function(_i, _l) {
 		return _i.run([
-			["run", ["import", ["string", "RunGML/programs/{0}.txt", _l[0]]]]
+			["run", ["import", ["string", "RunGML/programs/{0}.json", _l[0]]]]
 		])
 	},
 @"Run a program from a file in the incdlued RunGML/programs directory
@@ -667,7 +667,7 @@ new RunGML_Op ("runprog",
 	
 new RunGML_Op ("example",
 	function(_i, _l) {
-		return _i.run(["run", ["import", ["string", "RunGML/programs/examples/{0}.txt", _l[0]]]])
+		return _i.run(["run", ["import", ["string", "RunGML/programs/examples/{0}.json", _l[0]]]])
 	},
 @"Run an included example program
     - args: [example_program_name]
@@ -1593,6 +1593,46 @@ new RunGML_Op("geq",
 )
 
 #endregion Logic
+
+#region Distance & Direction
+
+new RunGML_Op("point_dist",
+	function(_i, _l) {
+		return point_distance(_l[0], _l[1], _l[2], _l[3]);
+	},
+@"Find the distance between two points
+    - args: [x1, y1, x2, y2]
+    - output: distance"
+)
+
+new RunGML_Op("point_dir",
+	function(_i, _l) {
+		return point_direction(_l[0], _l[1], _l[2], _l[3]);
+	},
+@"Find the direction from one point to another
+    - args: [x1, y1, x2, y2]
+    - output: distance"
+)
+
+new RunGML_Op("lendir_x",
+	function(_i, _l) {
+		return lengthdir_x(_l[0], _l[1]);
+	},
+@"Find the x component for a given vector
+    - args: [length, direction]
+    - output: x_component"
+)
+
+new RunGML_Op("lendir_y",
+	function(_i, _l) {
+		return lengthdir_y(_l[0], _l[1]);
+	},
+@"Find the y component for a given vector
+    - args: [length, direction]
+    - output: y_component"
+)
+
+#endregion Distance & Direction
 	
 #region Rooms
 
@@ -1664,9 +1704,29 @@ new RunGML_Op("display_w",
 new RunGML_Op("display_h",
 	function(_i, _l=[]) {
 		//
-		return display_get_height;
+		return display_get_height();
 	},
 @"Returns the height of the display.
+    - args: []
+    - output: [height]"
+)
+
+new RunGML_Op("display_gui_w",
+	function(_i, _l=[]) {
+		//
+		return display_get_gui_width();	
+	},
+@"Returns the width of the display GUI.
+    - args: []
+    - output: [width]"
+)
+	
+new RunGML_Op("display_gui_h",
+	function(_i, _l=[]) {
+		//
+		return display_get_gui_height();
+	},
+@"Returns the height of the display GUI.
     - args: []
     - output: [height]"
 )
@@ -1920,28 +1980,25 @@ new RunGML_Op("draw_font",
 	
 new RunGML_Op("draw_halign",
 	function(_i, _l) {
-		if array_length(_l) < 1 {
-			return draw_get_halign();	
-		} else {
-			switch(_l[0]) {
-				case "left":
-				case fa_left:
-				case -1:
-					draw_set_halign(fa_left);
-					break;
-				case "right":
-				case fa_right:
-				case 1:
-					draw_set_halign(fa_right);
-					break;
-				case "center":
-				case fa_center:
-				case 0:
-					draw_set_halign(fa_center);
-					break;
-			}
-			return [];
+		if array_length(_l) < 1 return draw_get_halign();	
+		switch(_l[0]) {
+			case "left":
+			case fa_left:
+			case -1:
+				draw_set_halign(fa_left);
+				break;
+			case "right":
+			case fa_right:
+			case 1:
+				draw_set_halign(fa_right);
+				break;
+			case "center":
+			case fa_center:
+			case 0:
+				draw_set_halign(fa_center);
+				break;
 		}
+		return [];
 	},
 @"Get or set the horizontal draw alignment
     - args: [(value)]
@@ -1957,17 +2014,17 @@ new RunGML_Op("draw_valign",
 				case "top":
 				case fa_top:
 				case -1:
-					draw_set_halign(fa_top);
+					draw_set_valign(fa_top);
 					break;
 				case "bottom":
 				case fa_bottom:
 				case 1:
-					draw_set_halign(fa_bottom);
+					draw_set_valign(fa_bottom);
 					break;
 				case "middle":
 				case fa_middle:
 				case 0:
-					draw_set_halign(fa_middle);
+					draw_set_valign(fa_middle);
 					break;
 			}
 			return [];
