@@ -1,4 +1,4 @@
-This is an explanation of the [bounce](src/datafiles/RunGML/programs/examples/bounce.txt) example program.
+This is an explanation of the [bounce](src/datafiles/RunGML/programs/examples/bounce.json) example program.
 
 ```
 ["object", 0, 0, 0, {
