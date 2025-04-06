@@ -145,8 +145,9 @@ Draw a second ellipse in the inverse color with the normal radii.
 Draw the text string at the center of the ellipse, then restore the prior draw formatting from the backup.
 
 ```
+	]
 }]
 ```
-Finally, close the event dictionary and the top-level list.
+Finally, close the Draw GUI event definition, the event dictionary, and the top-level list.
 
 
