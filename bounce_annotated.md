@@ -87,9 +87,13 @@ If so, do the follwing:
 					["p", "color_B", ["color_inv", ["p", "color_A"]]]
 			]}
 		],
+```
+Then repeat the process for vertical movement.
+
+```
 	],
 ```
-Then repeat the process for vertical movement to complete the step event.
+And end the list to complete the step event's definition.
 
 ```json
 	"draw_gui": ["pass",
@@ -137,8 +141,12 @@ Draw a second ellipse in the inverse color with the normal radii.
 ```json
 		["rp", "draw_text", "x", "y", "text"],
 		["r", "draw_format", "_old_format"]
-	]
+```
+Draw the text string at the center of the ellipse, then restore the prior draw formatting from the backup.
+
+```
 }]
 ```
+Finally, close the event dictionary and the top-level list.
 
-Draw the text string at the center of the ellipse, then restore the prior draw formatting from the backup.
+
