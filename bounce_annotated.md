@@ -36,7 +36,7 @@ The body of the create function operates as follows:
     - To make the object bounce around the *room* instead of the *screen*, we could replace `"display_gui_(w/h)"` with `"room_(w/h)"`, and define a `"draw"` event instead of a `"draw_gui"` event below.
 - Define the horizontal and vertical radii for an ellipse.
 - Set the outline width of the ellipse.
-- Set a movemnt speed of 300 pixels/second.
+- Set a movement speed of 300 pixels/second.
     - We use `"v"` instead of `"p"` here to set a register value in the interpreter rather than an instance variable for the object.  This value is only used temporarily, we won't need to reference it again after creation.
 - Select a random starting direction around a diagonal (pick a random number between 30 and 60, and add it to a random multiple of 90).
 - Compute the initial x- and y-velocities based on the starting speed and direction.
