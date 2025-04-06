@@ -1,6 +1,6 @@
 This is an explanation of the [bounce](src/datafiles/RunGML/programs/examples/bounce.json) example program.
 
-```
+```json
 ["object", 0, 0, 0, {
 ```
 At the top level, this program is creating a new instance of the [oRunGML_ObjectTemplate](src/objects/oRunGML_ObjectTemplate) object.
@@ -8,7 +8,7 @@ The `"object"` operator takes four arguments: x-position, y-position, layer/dept
 If the third argument is a string it will be interpreted as a layer name, while a number will be interpreted as a depth.
 So, we are creating an instance at x=0, y=0, depth=0, with the following event definitions...
 
-```
+```json
 	"create": ["pass",
 		["rand_seed"],
 		["p", "x", ["rand_int", 0, ["display_gui_w"]]],
@@ -43,17 +43,17 @@ The body of the create function operates as follows:
 - Create the inverse of that color.
 - Define a text string to be displayed.
 
-``` 
+```json
 	"step": ["pass",
 ```
 Next is the object's Step event.  Let's look at this in a few separate chunks.
 
-```
+```json
 		["p", "x", ["add", ["p", "x"], ["mult", ["delta"], ["p", "x_speed"]]]],
 ```
 First, increment the object's `x` variable by an amount equal to its `x_speed` multiplied by the time since the previous frame in seconds.
 
-```
+```json
 		["if",
 			["or",
 				["lt", ["p", "x"], 0],
@@ -73,7 +73,7 @@ If so, do the follwing:
 - Clamp `x` within the bounds
 - Pick a new random color and find its inverse
 
-```
+```json
 		["p", "y", ["add", ["p", "y"], ["mult", ["delta"], ["p", "y_speed"]]]],
 		["if",
 			["or",
@@ -91,12 +91,12 @@ If so, do the follwing:
 ```
 Then repeat the process for vertical movement to complete the step event.
 
-```
+```json
 	"draw_gui": ["pass",
 ```
 Finally, define a Draw GUI event for the object, starting with `"pass"` as usual.
 
-```
+```json
 		["draw_ellipse", 
 			["sub", ["p", "x"], ["rp", "add", "r_x", "border"]],
 			["sub", ["p", "y"], ["rp", "add", "r_y", "border"]],
@@ -111,7 +111,7 @@ Draw an ellipse in the first color with the border width added to its radii.  Th
 
 Preceding an operator with `"rp"` will substitute string arguments for the value of parent instance variables named by those strings, where applicable. So `["rp", "add", "r_x", "border"]` is equivalent to `["add", ["p", "r_x"], ["p", "border"]],`
 
-```
+```json
 		["draw_ellipse", 
 			["rp", "sub", "x", "r_x"],
 			["rp", "sub", "y", "r_y"],
@@ -124,7 +124,7 @@ Preceding an operator with `"rp"` will substitute string arguments for the value
 
 Draw a second ellipse in the inverse color with the normal radii.
 
-```
+```json
 		["v", "_old_format", ["draw_format"]],
 		["draw_color", ["p", "color_A"]],
 		["draw_halign", "center"],
@@ -134,7 +134,7 @@ Draw a second ellipse in the inverse color with the normal radii.
 ```
 - Create a backup of the current draw formatting, then set the draw color, horizontal alignment, vertical alignment, and font.
 
-```
+```json
 		["rp", "draw_text", "x", "y", "text"],
 		["r", "draw_format", "_old_format"]
 	]
