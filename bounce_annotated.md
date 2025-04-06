@@ -4,7 +4,7 @@ This is an explanation of the [bounce](src/datafiles/RunGML/programs/examples/bo
 ["object", 0, 0, 0, {
 ```
 At the top level, this program is creating a new instance of the [oRunGML_ObjectTemplate](src/objects/oRunGML_ObjectTemplate) object.
-The "object" operator takes four arguments: x-position, y-position, layer/depth, and a dictionary of event defintions.
+The `"object"` operator takes four arguments: x-position, y-position, layer/depth, and a dictionary of event defintions.
 If the third argument is a string it will be interpreted as a layer name, while a number will be interpreted as a depth.
 So, we are creating an instance at x=0, y=0, depth=0, with the following event definitions...
 
@@ -26,17 +26,17 @@ So, we are creating an instance at x=0, y=0, depth=0, with the following event d
 	],
 ```
 First we define the object's Create event, which will be run immediately.
-Starting with "pass" as the top-level operator means all other elements of the list will be evaluated and their outputs ignored. This is a common way to structure multi-line programs.
+Starting with `"pass"` as the top-level operator means all other elements of the list will be evaluated and their outputs ignored. This is a common way to structure multi-line programs.
 
 The body of the create function operates as follows:
 
-- Set the object's x and y variables randomly within screenspace.
-    - The "p" operator is used to reference the parent of the RunGML interpreter executing the program, which in this case will be the oRunGML_ObjectTemplate instance we are creating.
-    - To make the object bounce around the *room* instead of the *screen*, we could replace "display_gui_(w/h)" with "room_(w/h)", and define a "draw" event instead of a "draw_gui" event below.
+- Set the object's `x` and `y` variables randomly within screenspace.
+    - The `"p"` operator is used to reference the parent of the RunGML interpreter executing the program, which in this case will be the oRunGML_ObjectTemplate instance we are creating.
+    - To make the object bounce around the *room* instead of the *screen*, we could replace `"display_gui_(w/h)"` with `"room_(w/h)"`, and define a `"draw"` event instead of a `"draw_gui"` event below.
 - Define the horizontal and vertical radii for an ellipse.
 - Set the outline width of the ellipse.
 - Set a movemnt speed of 300 pixels/second.
-    - We use "v" instead of "p" here to set a register value in the interpreter rather than an instance variable for the object.
+    - We use `"v"` instead of `"p"` here to set a register value in the interpreter rather than an instance variable for the object.  This value is only used temporarily, we won't need to reference it again after creation.
 - Select a random starting direction around a diagonal (pick a random number between 30 and 60, and add it to a random multiple of 90).
 - Compute the initial x- and y-velocities based on the starting speed and direction.
 - Create a random color.
@@ -51,7 +51,7 @@ Next is the object's Step event.  Let's look at this in a few separate chunks.
 ```
 		["p", "x", ["add", ["p", "x"], ["mult", ["delta"], ["p", "x_speed"]]]],
 ```
-First, increment the object's x variable by an amount equal to its x_speed multiplied by the time since the previous frame in seconds.
+First, increment the object's `x` variable by an amount equal to its `x_speed` multiplied by the time since the previous frame in seconds.
 
 ```
 		["if",
@@ -67,10 +67,10 @@ First, increment the object's x variable by an amount equal to its x_speed multi
 			]}
 		],
 ```
-Next, check whether the object is outside the bounds of the screen (if x < 0 or x > display_get_gui_width).
+Next, check whether the object is outside the bounds of the screen (`if x < 0 or x > display_get_gui_width()`).
 If so, do the follwing:
-- Multiply x_speed by -1 to change directions
-- Clamp the x-position within the bounds
+- Multiply `x_speed` by -1 to change directions
+- Clamp `x` within the bounds
 - Pick a new random color and find its inverse
 
 ```
@@ -89,12 +89,12 @@ If so, do the follwing:
 		],
 	],
 ```
-Then repeat the process for vertical movement.  That completes the step event.
+Then repeat the process for vertical movement to complete the step event.
 
 ```
 	"draw_gui": ["pass",
 ```
-Finally, define a Draw GUI event for the object, starting with "pass" as usual.
+Finally, define a Draw GUI event for the object, starting with `"pass"` as usual.
 
 ```
 		["draw_ellipse", 
@@ -109,7 +109,7 @@ Finally, define a Draw GUI event for the object, starting with "pass" as usual.
 
 Draw an ellipse in the first color with the border width added to its radii.  This will be the outline.
 
-Preceding an operator with "rp" will substitute string arguments for the value of parent instance variables named by those strings, where applicable. So `["rp", "add", "r_x", "border"]` is equivalent to `["add", ["p", "r_x"], ["p", "border"]],`
+Preceding an operator with `"rp"` will substitute string arguments for the value of parent instance variables named by those strings, where applicable. So `["rp", "add", "r_x", "border"]` is equivalent to `["add", ["p", "r_x"], ["p", "border"]],`
 
 ```
 		["draw_ellipse", 
