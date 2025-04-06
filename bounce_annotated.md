@@ -6,6 +6,7 @@ This is an explanation of the [bounce](src/datafiles/RunGML/programs/examples/bo
 At the top level, this program is creating a new instance of the [oRunGML_ObjectTemplate](src/objects/oRunGML_ObjectTemplate) object.
 The `"object"` operator takes four arguments: x-position, y-position, layer/depth, and a dictionary of event defintions.
 If the third argument is a string it will be interpreted as a layer name, while a number will be interpreted as a depth.
+Events definitions are RunGML programs themselves, but wrapping them in a dictionary prevents those programs from being evaluated now.  They'll be stored in the object and run by it later, using its own dedicated instance of the RunGML interpreter.
 So, we are creating an instance at x=0, y=0, depth=0, with the following event definitions...
 
 ```json
