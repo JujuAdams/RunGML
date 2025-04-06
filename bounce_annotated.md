@@ -25,7 +25,7 @@ So, we are creating an instance at x=0, y=0, depth=0, with the following event d
 		["p", "text", "RunGML"]
 	],
 ```
-First we define the object's Create event, which will be run immediately.
+First define the object's Create event, which will be run immediately.
 Starting with `"pass"` as the top-level operator means all other elements of the list will be evaluated and their outputs ignored. This is a common way to structure multi-line programs.
 
 The body of the create function operates as follows:
