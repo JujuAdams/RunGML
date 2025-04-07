@@ -236,6 +236,17 @@ new RunGML_Op("operator_name",
 
 The function definition in the second argument must take two arguments: an instance of the RunGML interpreter, and a list of arguments being passed to the operator.  The function definition can also be replaced with a string, number, asset reference, etc. to define a constant.
 
+Best practice is to format the documentation string as follows:
+```
+@"
+Description of what the operator does.
+- args: [list, of, expected, arguments]
+- output: expected_output
+"
+```
+
+The list of constraints is optional.  If present, it should contain `RunGML_Constraint`, `RunGML_Constraint_ArgCount`, and/or `RunGML_Constraint_ArgType` structs.
+
 Custom aliases can be added from anywhere using RunGML_alias("nickname", "operator_name").  They also *should* be defined in RunGML_ConfigOps().
 
 Documentation for custom operators and aliases will automatically become available via `"help"` and `"manual"`.
