@@ -11,43 +11,58 @@ So, we are creating an instance at x=0, y=0, depth=0, with the following event d
 
 ```json
 	"create": ["pass",
-		["rand_seed"],
-		["p", "x", ["rand_int", 0, ["display_gui_w"]]],
-		["p", "y", ["rand_int", 0, ["display_gui_h"]]],
-		["p", "r_x", 50],
-		["p", "r_y", 30],
-		["p", "border", 3],
-		["v", "_speed", 300],
-		["v", "_dir", ["add", ["rand", 30, 60], ["mult", 90, ["choose", ["list", 0, 1, 2, 3]]]]],
-		["p", "x_speed", ["r", "lendir_x", "_speed", "_dir"]],
-		["p", "y_speed", ["r", "lendir_y", "_speed", "_dir"]],
-		["p", "color_A", ["color_rand"]],
-		["p", "color_B", ["color_inv", ["p", "color_A"]]],
-		["p", "text", "RunGML"]
-	],
 ```
 First define the object's Create event, which will be run immediately.
 Starting with `"pass"` as the top-level operator means all other elements of the list will be evaluated and their outputs ignored. This is a common way to structure multi-line programs.
 
-The body of the create function operates as follows:
+```
+		["rand_seed"],
+```
+Initialize random number generation.
 
-- Set the object's `x` and `y` variables randomly within screenspace.
-    - The `"p"` operator is used to reference the parent of the RunGML interpreter executing the program, which in this case will be the oRunGML_ObjectTemplate instance we are creating.
-    - To make the object bounce around the *room* instead of the *screen*, we could replace `"display_gui_(w/h)"` with `"room_(w/h)"`, and define a `"draw"` event instead of a `"draw_gui"` event below.
-- Define the horizontal and vertical radii for an ellipse.
-- Set the outline width of the ellipse.
-- Set a movement speed of 300 pixels/second.
-    - We use `"v"` instead of `"p"` here to set a register value in the interpreter rather than an instance variable for the object.  This value is only used temporarily, we won't need to reference it again after creation.
-- Select a random starting direction around a diagonal (pick a random number between 30 and 60, and add it to a random multiple of 90).
-- Compute the initial x- and y-velocities based on the starting speed and direction.
-- Create a random color.
-- Create the inverse of that color.
-- Define a text string to be displayed.
+```json
+		["p", "x", ["rand_int", 0, ["display_gui_w"]]],
+		["p", "y", ["rand_int", 0, ["display_gui_h"]]],
+```
+Set the object's `x` and `y` variables randomly within screenspace.
+- The `"p"` operator is used to reference the parent of the RunGML interpreter executing the program, which in this case will be the oRunGML_ObjectTemplate instance we are creating.
+- To make the object bounce around the *room* instead of the *screen*, we could replace `"display_gui_(w/h)"` with `"room_(w/h)"`, and define a `"draw"` event instead of a `"draw_gui"` event below.
+
+```json
+		["p", "r_x", 50],
+		["p", "r_y", 30],
+		["p", "border", 3],
+```
+Set values to define an ellipse, with horizontal radius of 50px, vertical radius of 30px, and a 3px wide outline.
+
+```json
+		["v", "_speed", 300],
+		["v", "_dir", ["add", ["rand", 30, 60], ["mult", 90, ["choose", ["list", 0, 1, 2, 3]]]]],
+		["p", "x_speed", ["r", "lendir_x", "_speed", "_dir"]],
+		["p", "y_speed", ["r", "lendir_y", "_speed", "_dir"]],
+```
+Set a movement speed of 300 pixels/second, select a random direction around a diagonal (pick a random number between 30 and 60, and add it to a random multiple of 90), and compute the initial x- and y-velocities.  We use `"v"` instead of `"p"` here to set a register value in the interpreter rather than an instance variable for the object.  The `_speed` and `_dir` values are only used temporarily, we won't need to reference them again after creation.
+
+```json
+		["p", "color_A", ["color_rand"]],
+		["p", "color_B", ["color_inv", ["p", "color_A"]]],
+```
+Create a random color and its inverse.
+
+```json
+		["p", "text", "RunGML"]
+```
+Set a text string to be drawn over the ellipse
+
+```
+	],
+```
+Close the list to end the create event definition.
 
 ```json
 	"step": ["pass",
 ```
-Next is the object's Step event.  Let's look at this in a few separate chunks.
+Next is the object's Step event.
 
 ```json
 		["p", "x", ["add", ["p", "x"], ["mult", ["delta"], ["p", "x_speed"]]]],
@@ -68,9 +83,9 @@ First, increment the object's `x` variable by an amount equal to its `x_speed` m
 			]}
 		],
 ```
-Next, check whether the object is outside the bounds of the screen (`if x < 0 or x > display_get_gui_width()`).
-If so, do the follwing:
-- Multiply `x_speed` by -1 to change directions
+Next is a conditional.  Check whether the object is outside the bounds of the screen (`if x < 0 or x > display_get_gui_width()`).
+If so, make it bounce in the opposite direction:
+- Multiply `x_speed` by -1
 - Clamp `x` within the bounds
 - Pick a new random color and find its inverse
 
@@ -94,7 +109,7 @@ Then repeat the process for vertical movement.
 ```
 	],
 ```
-And end the list to complete the step event's definition.
+And close the list to complete the step event's definition.
 
 ```json
 	"draw_gui": ["pass",
