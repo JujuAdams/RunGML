@@ -65,6 +65,7 @@
 		["draw_valign", "middle"],
 		["draw_font", "fntRunGML_Console"],
 		["rp", "draw_text", "x", "y", "text"],
+		["rp", "draw_text", ["add", 1, ["p", "x"]], "y", "text"],
 		["r", "draw_format", "_old_format"]
 	]
 }]

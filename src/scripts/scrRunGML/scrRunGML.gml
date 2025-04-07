@@ -472,8 +472,8 @@ Homepage: {1}",
 		url_open(_filename)
 		return [];
 	},
-@"Write full documentation for all RunGML operators to a file and view it in the browser.
-- args: [(filename)]
+@"Generate full markdown-formatted documentation for all RunGML operators and view it in the browser.
+- args: [(filename='RunGML/manual.md')]
 - output: []",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )

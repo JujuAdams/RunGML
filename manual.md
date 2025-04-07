@@ -551,8 +551,8 @@ Check whether the first argument is less than the second
     - output: [(A < B)]
 
 ### manual
-Write full documentation for all RunGML operators to a file and view it in the browser.
-- args: [(filename)]
+Generate full markdown-formatted documentation for all RunGML operators and view it in the browser.
+- args: [(filename='RunGML/manual.md')]
 - output: []
 - constraints:
     - count(args) eq 0
