@@ -33,7 +33,7 @@ You can also execute programs that are stored in JSON files:
 
 `RunGMLI.runfile(["filepath"])`
 
-Programs stored in `[included files directory]/RunGML/programs/` can be quickly run by name (exculding the `.json` extension, it will be added automatically):
+Programs stored in `[included files directory]/RunGML/programs/` can be quickly run by name (excluding the `.json` extension, it will be added automatically):
 
 `RunGMLI.runfile(["filename"])`
 
