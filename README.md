@@ -224,7 +224,7 @@ Custom operators *should* be defined in the `RunGML_ConfigOps()` function in the
 Custom operators *can* be defined anywhere, anytime by calling:
 ```
 new RunGML_Op("operator_name",
-    function(interpreter, argument_list){},
+    function(_i, _l){},
     "documentation string",
     [
         constraint0,
