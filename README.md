@@ -219,4 +219,23 @@ This library includes two template objects, `oRunGML_Object` and `oRunGML_Object
 
 See the [manual](manual.md) for full documentation of supported operators ane aliases.
 
-Additional operators should be defined in the `RunGML_ConfigOps()` function in the [scrRunGML_Config](src/scripts/scrRunGML_Config/scrRunGML_Config.gml) script, which includes an example definition for `"test_operator`" that can be copied as a template.
+Custom operators *should* be defined in the `RunGML_ConfigOps()` function in the [scrRunGML_Config](src/scripts/scrRunGML_Config/scrRunGML_Config.gml) script, which includes an example definition for `"test_operator`" that can be copied as a template.
+
+Custom operators *can* be defined anywhere, anytime by calling:
+```
+new RunGML_Op("operator_name",
+    function(interpreter, argument_list){},
+    "documentation string",
+    [
+        constraint0,
+        constraint1,
+        ...
+    ]
+);
+```
+
+The function definition in the second argument must take two arguments: an instance of the RunGML interpreter, and a list of arguments being passed to the operator.  The function definition can also be replaced with a string, number, asset reference, etc. to define a constant.
+
+Custom aliases can be added from anywhere using RunGML_alias("nickname", "operator_name").  They also *should* be defined in RunGML_ConfigOps().
+
+Documentation for custom operators and aliases will automatically become available via `"help"` and `"manual"`.
