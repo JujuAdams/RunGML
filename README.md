@@ -17,6 +17,7 @@ In addition to the RunGML language definition and interpreter, this library also
 - An [interactive console](#console)
 - A [template object](#objects) with events pre-defined to execute RunGML programs
 - A test room, test object, and example programs to demonstrate basic functionality
+    - See [bounce_annotated.md](bounce_annotated.md) for a line-by-line explanation of the [bounce](src/datafiles/RunGML/programs/examples/bounce.json) example program.
 - Thorough documentation that can be accessed using `"help"` or `"manual`.  The latter generates markdown-formatted documentation for all operators, a copy of which is included here as [manual.md](manual.md).
 
 ## Running Programs
