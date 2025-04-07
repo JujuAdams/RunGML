@@ -156,9 +156,15 @@ Draw a second ellipse in the inverse color with the normal radii.
 
 ```json
 		["rp", "draw_text", "x", "y", "text"],
+		["rp", "draw_text", ["add", 1, ["p", "x"]], "y", "text"],
+```
+Draw the text string at the center of the ellipse, and draw it again one pixel to the right to make it more readable.
+
+```json
 		["r", "draw_format", "_old_format"]
 ```
-Draw the text string at the center of the ellipse, then restore the prior draw formatting from the backup.
+
+Restore the prior draw formatting from the backup.
 
 ```
 	]
