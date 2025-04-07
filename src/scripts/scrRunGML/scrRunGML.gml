@@ -160,15 +160,17 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	desc = _desc;
 	constraints = _constraints;
 	help = function() {
-		var _docstring = string(@"- {0}", name);
-		if array_length(aliases) > 0 _docstring += string("\n    - aliases: {0}", aliases)
-		_docstring += string("\n    - desc: {0}", desc);
+		var _docstring = string(@"### {0}", name);
+		_docstring += string("\n{0}", desc);
 		if typeof(f) != "method" _docstring += " (constant)"
+		if array_length(aliases) > 0 {
+			_docstring += string("\n- aliases: {0}", aliases);
+		}
 		var _n_constraints = array_length(constraints);
 		if _n_constraints > 0 {
-			_docstring += "\n    - constraints:";
+			_docstring += "\n- constraints:";
 			for (var i=0; i<_n_constraints; i++) {
-				_docstring += string("\n        - {0}", constraints[i].doc())
+				_docstring += string("\n    - {0}", constraints[i].doc())
 			}
 		}
 		return _docstring;
@@ -263,64 +265,64 @@ global.RunGML_Aliases = {}
 
 new RunGML_Op("version", RunGML_Version,
 @"Returns the RunGML version number
-    - args: []
-    - output: string",
+- args: []
+- output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
 new RunGML_Op("gm_version", GM_version,
 @"Returns the game's version number,
-    - args: []
-    - output: string",
+- args: []
+- output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
 new RunGML_Op ("true", true,
 @"Return the GameMaker constant true
-    - args: []
-    - output: true",
+- args: []
+- output: true",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
 new RunGML_Op ("false", false,
 @"Return the GameMaker constant false
-    - args: []
-    - output: false",
+- args: []
+- output: false",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
 new RunGML_Op ("noone", noone,
 @"Return the GameMaker constant noone
-    - args: []
-    - output: noone",
+- args: []
+- output: noone",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
 new RunGML_Op ("undefined", undefined,
 @"Return the GameMaker constant undefined
-    - args: []
-    - output: undefined",
+- args: []
+- output: undefined",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
 new RunGML_Op ("pi", pi,
 @"Return the value of the mathematical constant e
-    - args: []
-    - output: pi",
+- args: []
+- output: pi",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
 new RunGML_Op ("e", exp(1),
 @"Return the value of the mathematical constant e
-    - args: []
-    - output: e",
+- args: []
+- output: e",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
 new RunGML_Op ("phi", (1+sqrt(5))/2.0,
 @"Return the value of the mathematical constant phi
-    - args: []
-    - output: phi",
+- args: []
+- output: phi",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
@@ -334,8 +336,8 @@ new RunGML_Op("update",
 		return [];
 	},
 @"Returns the RunGML web address
-    - args: []
-    - output: string",
+- args: []
+- output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
@@ -344,8 +346,8 @@ new RunGML_Op("op_count",
 		return struct_names_count(_i.ops);
 	},
 @"Returns the number of supported operators
-    - args: []
-    - output: number",
+- args: []
+- output: number",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
@@ -356,8 +358,8 @@ new RunGML_Op("op_list",
 		return _op_list;
 	},
 @"Returns a list of supported operators
-    - args: []
-    - output: [string, *]",
+- args: []
+- output: [string, *]",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
@@ -373,8 +375,8 @@ new RunGML_Op("op_names",
 		return _str;
 	},
 @"Returns a string listing names of supported operators
-    - args: []
-    - output: string",
+- args: []
+- output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
@@ -415,8 +417,8 @@ Run ["manual"] to generate full documentation for all operators.
 		}	
 	},
 @"Display documentation for RunGML, or for an operator named by the first argument.
-    - args: [(string)]
-    - output: string", 
+- args: [(string)]
+- output: string", 
 	[
 		new RunGML_Constraint_ArgCount("leq", 1),
 		new RunGML_Constraint_ArgType(0, "string", false)
@@ -429,15 +431,41 @@ new RunGML_Op ("manual",
 		if array_length(_l) > 0 _filename = _l[0];
 		if file_exists(_filename) file_delete(_filename);
 		var _f = file_text_open_append(_filename)
-		var _ops = variable_struct_get_names(_i.ops);
+		var _ops = array_concat(variable_struct_get_names(_i.ops), variable_struct_get_names(_i.aliases));
 		array_sort(_ops, true);
 		var _op, _op_name;
-		file_text_write_string(_f, _i.run(["help"]));
-		file_text_write_string(_f, "\n\n## Operators\n");
+		file_text_write_string(_f, string(
+@"# RunGML Manual
+
+## About
+
+Version: {0}
+
+Homepage: {1}",
+			RunGML_Version,
+			RunGML_Homepage
+		));
+		file_text_write_string(_f, "\n\n## Operators & *Aliases*\n");
+		var _str = "";
 		for (var i=0; i<array_length(_ops); i++) {
 			_op_name = _ops[i];
+			if struct_exists(_i.ops, _op_name) {
+				_op = struct_get(_i.ops, _op_name);
+				_str = string("[{0}]({1})", _op_name, string("#{0}", _op.name))
+			} else {
+				_op = struct_get(_i.aliases, _op_name);
+				_str = string("[*{0}*]({1})", _op_name, string("#{0}", _op))
+			}
+			
+			if i > 0 _str = string_concat(", ", _str)
+			file_text_write_string(_f, _str)
+		}
+		
+		file_text_write_string(_f, "\n\n## Operator Documentation\n");
+		for (var i=0; i<array_length(_ops); i++) {
+			_op_name = _ops[i];
+			if !struct_exists(_i.ops, _op_name) continue;
 			_op = struct_get(_i.ops, _op_name)
-			if _op.name != _op_name continue; // Don't re-document aliases
 			file_text_write_string(_f, "\n"+_op.help()+"\n")
 		}
 		file_text_close(_f);
@@ -445,8 +473,8 @@ new RunGML_Op ("manual",
 		return [];
 	},
 @"Write full documentation for all RunGML operators to a file and view it in the browser.
-    - args: [(filename)]
-    - output: []",
+- args: [(filename)]
+- output: []",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
@@ -456,8 +484,8 @@ new RunGML_Op ("this",
 		return _i;
 	},
 @"Return a reference to the current RunGML interpreter
-    - args: []
-    - output: instance",
+- args: []
+- output: instance",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
@@ -478,8 +506,8 @@ new RunGML_Op("parent",
 		
 	},
 @"Return a reference to the RunGML interpreter's parent object.
-    - args: []
-    - output: instance",
+- args: []
+- output: instance",
 	[new RunGML_Constraint_ArgCount("leq", 2)]
 )
 	
@@ -502,8 +530,8 @@ new RunGML_Op("console",
 		}
 	},
 @"Return a reference to the RunGML console, creating one if it doesn't exist
-    - args: []
-    - output: instance",
+- args: []
+- output: instance",
 	[
 		new RunGML_Constraint_ArgCount("leq", 2),
 		new RunGML_Constraint_ArgType(0, "string", false)
@@ -518,8 +546,8 @@ new RunGML_Op("clear",
 		return [];
 	},
 @"If run from a console, clear that console's history
-    - args: []
-    - output: instance",
+- args: []
+- output: instance",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
@@ -546,11 +574,13 @@ new RunGML_Op ("alias",
 		}		
 	},
 @"Create an operator alias. Behavior depends on the number of arguments:
-        - 0: Return the interpreter's entire alias struct
-        - 1: If the argument names an operator or alias, return a list of all synonyms starting with the real name.
-        - 2: Creates a new alias with nickname arg0 for operator arg1.  arg0 cannot be in use, arg1 must be defined.
-    - args: [(nickname), (name)]
-    - output: struct or list",
+
+0. Return the interpreter's entire alias struct
+1. If the argument names an operator or alias, return a list of all synonyms starting with the real name.
+2. Creates a new alias with nickname arg0 for operator arg1.  arg0 cannot be in use, arg1 must be defined.
+	
+- args: [(nickname), (name)]
+- output: struct or list",
 	[
 		new RunGML_Constraint_ArgCount("leq", 2),
 		new RunGML_Constraint_ArgType(0, "string", false),
@@ -567,8 +597,8 @@ new RunGML_Op ("pass",
 		return [];
 	},
 @"Do nothing
-    - args: [*]
-    - output: []"
+- args: [*]
+- output: []"
 )
 	
 new RunGML_Op ("run",
@@ -576,8 +606,8 @@ new RunGML_Op ("run",
 		return _i.run(_l);
 	},
 @"Run arguments as a program.
-    - args: [*]
-    - output: *"
+- args: [*]
+- output: *"
 )
 	
 new RunGML_Op ("exec",
@@ -585,8 +615,8 @@ new RunGML_Op ("exec",
 		return _i.run(json_parse(_l[0]));
 	},
 @"Execute a string as a program.
-    - args: [string]
-    - output: *",
+- args: [string]
+- output: *",
 	[
 		new RunGML_Constraint_ArgCount("eq", 1),
 		new RunGML_Constraint_ArgType(0, "string")
@@ -600,8 +630,8 @@ new RunGML_Op ("last",
 		return [];
 	},
 @"Return the value of the last argument
-    - args: [*]
-    - output: *"
+- args: [*]
+- output: *"
 )
 	
 new RunGML_Op ("out",
@@ -609,8 +639,8 @@ new RunGML_Op ("out",
 		return {"out": _l};
 	},
 @"Wrap argument list in a struct so it can be returned unevaluated.
-    - args: [*]
-    - output: struct"
+- args: [*]
+- output: struct"
 )
 	
 new RunGML_Op ("in",
@@ -618,8 +648,8 @@ new RunGML_Op ("in",
 		return struct_get(_l[0], "out");
 	},
 @"Retrieve the output list from a struct produced by the 'out' operator.
-    - args: [struct]
-    - output: list",
+- args: [struct]
+- output: list",
 	[new RunGML_Constraint_ArgType(0, "struct")]
 )
 	
@@ -636,8 +666,8 @@ new RunGML_Op ("import",
 		return json_parse(_json_string);
 	},
 @"Import JSON from a file
-    - args: [filepath]
-    - output: json",
+- args: [filepath]
+- output: json",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
@@ -648,8 +678,8 @@ new RunGML_Op ("runfile",
 		])
 	},
 @"Run a program from a file
-    - args: [filepath]
-    - output: *",
+- args: [filepath]
+- output: *",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
@@ -660,8 +690,8 @@ new RunGML_Op ("runprog",
 		])
 	},
 @"Run a program from a file in the incdlued RunGML/programs directory
-    - args: [program_name]
-    - output: *",
+- args: [program_name]
+- output: *",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
@@ -670,8 +700,8 @@ new RunGML_Op ("example",
 		return _i.run(["run", ["import", ["string", "RunGML/programs/examples/{0}.json", _l[0]]]])
 	},
 @"Run an included example program
-    - args: [example_program_name]
-    - output: *",
+- args: [example_program_name]
+- output: *",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
@@ -688,8 +718,8 @@ new RunGML_Op ("export",
 		return []
 	},
 @"Export JSON to a file
-    - args: [path, data, (pretty=true)]
-    - output: []",
+- args: [path, data, (pretty=true)]
+- output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "string"),
 		new RunGML_Constraint_ArgType(1, ["array", "struct"]),
@@ -702,8 +732,8 @@ new RunGML_Op ("list",
 		return _l;
 	},
 @"Return arguments as a list
-    - args: []
-    - output: []"
+- args: []
+- output: []"
 )
 	
 new RunGML_Op ("prog",
@@ -714,8 +744,8 @@ new RunGML_Op ("prog",
 		return [];
 	},
 @"Run arguments as programs
-    - args: []
-    - output: []",
+- args: []
+- output: []",
 	[new RunGML_Constraint_ArgType(0, "array")]
 )
 	
@@ -730,8 +760,8 @@ new RunGML_Op("if",
 		}
 	},
 @"Evaluate and act on a conditional
-    - args: [conditional {'true': program, 'false': program}]
-    - output: []",
+- args: [conditional {'true': program, 'false': program}]
+- output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "bool"),
 		new RunGML_Constraint_ArgType(1, "struct"),
@@ -748,8 +778,8 @@ new RunGML_Op("switch",
 		}
 	},
 @"Perform switch/case evaluation
-    - args: [value, {'case0': program, 'case1': program, 'default': program}]
-    - output: []",
+- args: [value, {'case0': program, 'case1': program, 'default': program}]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType(1, "struct")
@@ -768,8 +798,8 @@ new RunGML_Op("while",
 		}
 	},
 @"Exectue a function while a condition is true
-    - args: [{'check': program, 'do': program}]
-    - output: []",
+- args: [{'check': program, 'do': program}]
+- output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "struct")
 	]
@@ -783,8 +813,8 @@ new RunGML_Op("repeat",
 		}
 	},
 @"Repeat a function a fixed number of times
-    - args: [count, program]
-    - output: []",
+- args: [count, program]
+- output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "list")
@@ -852,11 +882,12 @@ new RunGML_Op ("var",
 		}
 	},
 @"Get and set variables.  Behavior changes based on number of arguments:
-        - 0: Returns the interpreter's entire registers struct.
-        - 1: Returns the value saved in the named register.
-        - 2: Sets the register named by the first argument to the value of the second argument.
-    - args: [int] or [string]
-    - output: *"
+
+0. Return the interpreter's entire registers struct.
+1. Return the value saved in the named register.
+2. Set the register named by the first argument to the value of the second argument.
+- args: [int] or [string]
+- output: *"
 )
 	
 new RunGML_Op ("reference",
@@ -873,16 +904,17 @@ new RunGML_Op ("reference",
 		else return undefined;
 	},	
 @"Operate on referenced values.  Behavior depends on the number of arguments:
-        - 0: Return the interpreter's registers struct (same as ['v'])
-        - 1+: If the first argument names an operator:
-            - Substitute any other arguments that name defined reigsters with their values.
-            - Run the first-argument operator on the resulting list of substituted arguments.
-            - For example, the following two programs are functionally equivalent:
-                - ['r', 'add', 'foo', 'bar']
-                - ['add', ['v', 'foo'], ['v', 'bar']]
-            - They will return the sum of the values in registers 'foo' and 'bar'.
-    - args: [(operator), (register_name, ...)]
-    - output: *"
+
+0. Return the interpreter's registers struct (same as ['v'])
+1. (or more) If the first argument names an operator:
+    - Substitute any other arguments that name defined reigsters with their values.
+    - Run the first-argument operator on the resulting list of substituted arguments.
+    - For example, the following two programs are functionally equivalent:
+        - ['r', 'add', 'foo', 'bar']
+        - ['add', ['v', 'foo'], ['v', 'bar']]
+    - They will return the sum of the values in registers 'foo' and 'bar'.
+- args: [(operator), (register_name, ...)]
+- output: *"
 )
 
 new RunGML_Op ("reference_parent",
@@ -899,16 +931,17 @@ new RunGML_Op ("reference_parent",
 		else return undefined;
 	},	
 @"Similar to the 'reference' ('r') operator, but substitutes with values from the parent's instance variables.  Behavior depends on the number of arguments:
-        - 0: Return the names of all parent instance variables
-        - 1+: If the first argument names an operator:
-            - Substitute any other arguments that name parent instance variables with their values
-            - Run the first-argument operator on the resulting list of substituted arguments.
-            - For example, the following two programs are functionally equivalent:
-                - ['rp', 'add', 'foo', 'bar']
-                - ['add', ['p', 'foo'], ['p', 'bar']]
-            - They will return the sum of the values in parent instance variables 'foo' and 'bar'.
-    - args: [(operator), (variable, ...)]
-    - output: *"
+
+0. Return the names of all parent instance variables
+1. (or more) If the first argument names an operator:
+    - Substitute any other arguments that name parent instance variables with their values
+    - Run the first-argument operator on the resulting list of substituted arguments.
+    - For example, the following two programs are functionally equivalent:
+        - ['rp', 'add', 'foo', 'bar']
+        - ['add', ['p', 'foo'], ['p', 'bar']]
+    - They will return the sum of the values in parent instance variables 'foo' and 'bar'.
+- args: [(operator), (variable, ...)]
+- output: *"
 )
 	
 new RunGML_Op("global",
@@ -928,11 +961,12 @@ new RunGML_Op("global",
 		}
 	},
 @"Create, read, or modify global variables. Behavior depends on the number of arguments:
-        - 0: return an empty struct
-        - 1: returns {'struct': arg0}
-        - 2: returns get_struct(arg0, arg1)
-    - args: []
-    - output: []"
+
+0. Return an empty struct
+1. Return {'struct': arg0}
+2. Return get_struct(arg0, arg1)
+- args: []
+- output: []"
 )
 	
 new RunGML_Op("inst",
@@ -954,10 +988,11 @@ new RunGML_Op("inst",
 		}
 	},
 @"Get and set instance variables. Behavior depends on the number of arguments:
-        - 2: returns variable_instance_get(arg0, arg1)
-        - 3: does variable_instance_set(arg0, arg1, arg2)
-    - args: [instance, index, (value)]
-    - output: *"
+
+2. Return variable_instance_get(arg0, arg1)
+3. Do variable_instance_set(arg0, arg1, arg2)
+- args: [instance, index, (value)]
+- output: *"
 )
 	
 new RunGML_Op("struct",
@@ -981,12 +1016,13 @@ new RunGML_Op("struct",
 		}
 	},
 @"Create, read, or modify a struct. Behavior depends on the number of arguments:
-        - 0: return an empty struct
-        - 1: returns {'struct': arg0}
-        - 2: returns get_struct(arg0, arg1)
-        - 3: returns set_struct(arg0, arg1, arg2);
-    - args: []
-    - output: []"
+
+0. Return an empty struct
+1. Return {'struct': arg0}
+2. Return get_struct(arg0, arg1)
+3. Return set_struct(arg0, arg1, arg2);
+- args: []
+- output: []"
 )
 	
 new RunGML_Op("struct_keys",
@@ -995,8 +1031,8 @@ new RunGML_Op("struct_keys",
 		return struct_get_names(_l[0]);
 	},
 @"Get a list of the keys in a struct
-    - args: [struct]
-    - output: [string, ...]"
+- args: [struct]
+- output: [string, ...]"
 )
 
 new RunGML_Op("array",
@@ -1024,12 +1060,13 @@ new RunGML_Op("array",
 		}
 	},
 @"Create, read, or modify a struct. Behavior depends on the number of arguments:
-        - 0: return an empty array
-        - 1: returns [arg0]
-        - 2: returns arg0[arg1]
-        - 3: sets arg0[arg1] = arg2;
-    - args: [(array), (index), (value)]
-    - output: [*]"
+
+0. Return an empty array
+1. Return [arg0]
+2. Return arg0[arg1]
+3. Set arg0[arg1] = arg2;
+- args: [(array), (index), (value)]
+- output: [*]"
 )
 
 new RunGML_Op("array_get",
@@ -1040,8 +1077,8 @@ new RunGML_Op("array_get",
 		return _arr[_index];
 	},
 @"Return a value from an array by index.
-    - args: [array, index]
-    - output: value",
+- args: [array, index]
+- output: value",
 	[
 		new RunGML_Constraint_ArgType(0, "array"),
 		new RunGML_Constraint_ArgType(1, "numeric"),
@@ -1063,8 +1100,8 @@ new RunGML_Op("len",
 		}
 	},
 @"Returns the length of a string, array, or struct.
-    - args: [string/array/struct]
-    - output: length"
+- args: [string/array/struct]
+- output: length"
 )
 
 #endregion Accessors
@@ -1077,8 +1114,8 @@ new RunGML_Op("add",
 		return _l[0] + _l[1];
 	},
 @"Add two or more numbers (use 'cat' or 'string' to combine strings)
-    - args: [A, B]
-    - output: A + B (+ ...)",
+- args: [A, B]
+- output: A + B (+ ...)",
 	[
 		new RunGML_Constraint_ArgCount("geq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1096,8 +1133,8 @@ new RunGML_Op("inc",
 		return [];
 	},
 @"Increment a variable by some amount.  If the variable is undefined, set it to that amount.
-    - args: [register_name, number]
-    - output: []",
+- args: [register_name, number]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType(0, "alphanumeric"),
@@ -1116,8 +1153,8 @@ new RunGML_Op("dec",
 		return [];
 	},
 @"Decrement a variable by some amount.  If the variable is undefined, set it to that amount.
-    - args: [register_name, number]
-    - output: []",
+- args: [register_name, number]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType(0, "alphanumeric"),
@@ -1131,8 +1168,8 @@ new RunGML_Op("sub",
 		return _l[0] - _l[1];	
 	},
 @"Subtract two numbers
-    - args: [A, B]
-    - output: A - B",
+- args: [A, B]
+- output: A - B",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1145,8 +1182,8 @@ new RunGML_Op("mult",
 		return _l[0] * _l[1];	
 	},
 @"Multiply two numbers
-    - args: [A, B]
-    - output: A * B",
+- args: [A, B]
+- output: A * B",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1159,8 +1196,8 @@ new RunGML_Op("div",
 		return _l[0] / _l[1];	
 	},
 @"Divide two numbers
-    - args: [A, B]
-    - output: A / B",
+- args: [A, B]
+- output: A / B",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1172,8 +1209,8 @@ new RunGML_Op("pow",
 		return power(_l[0], _l[1]);
 	},
 @"Raise one number to the power of another
-    - args: [A, B]
-    - output: A ^ B",
+- args: [A, B]
+- output: A ^ B",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1185,8 +1222,8 @@ new RunGML_Op("exp",
 		return exp(_l[0]);
 	},
 @"Raise e to some power
-    - args: [number]
-    - output: e ^ number",
+- args: [number]
+- output: e ^ number",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1199,10 +1236,11 @@ new RunGML_Op("log",
 		} else return logn(_l[1], _l[0]);
 	},
 @"Compute a logarithm.  Behavior depends on the number of arguments:
-        - 0: Return the log of the argument in base 10
-		- 1: Return the log of arg0 in the base of arg1
-    - args: [number, (base=10)]
-    - output: log_base(number)",
+
+0. Return the log of the argument in base 10
+1. Return the log of arg0 in the base of arg1
+- args: [number, (base=10)]
+- output: log_base(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "numeric", false)
@@ -1214,8 +1252,8 @@ new RunGML_Op("mod",
 		return _l[0] mod _l[1];
 	},
 @"Modulo operator
-    - args: [A, B]
-    - output: A mod B",
+- args: [A, B]
+- output: A mod B",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1227,8 +1265,8 @@ new RunGML_Op("min",
 		return min(_l[0], _l[1]);
 	},
 @"Return the smaller of two numbers
-    - args: [A, B]
-    - output: min(A, B)",
+- args: [A, B]
+- output: min(A, B)",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1240,8 +1278,8 @@ new RunGML_Op("max",
 		return max(_l[0], _l[1]);
 	},
 @"Return the larger of two numbers
-    - args: [A, B]
-    - output: max(A, B)",
+- args: [A, B]
+- output: max(A, B)",
 	[
 		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1253,8 +1291,8 @@ new RunGML_Op("round",
 		return round(_l[0]);
 	},
 @"Rounds a number
-    - args: [number]
-    - output: round(number)",
+- args: [number]
+- output: round(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1265,8 +1303,8 @@ new RunGML_Op("floor",
 		return floor(_l[0]);
 	},
 @"Rounds a number down
-    - args: [number]
-    - output: floor(number)",
+- args: [number]
+- output: floor(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1277,8 +1315,8 @@ new RunGML_Op("ceil",
 		return ceil(_l[0]);
 	},
 @"Rounds a number up
-    - args: [number]
-    - output: ceil(number)",
+- args: [number]
+- output: ceil(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1289,8 +1327,8 @@ new RunGML_Op("frac",
 		return frac(_l[0]);
 	},
 @"Returns the fractional portion of a number
-    - args: [number]
-    - output: frac(number)",
+- args: [number]
+- output: frac(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1301,8 +1339,8 @@ new RunGML_Op("sign",
 		return sign(_l[0]);
 	},
 @"Returns the sign of a number (1 if positive, -1 if negative)
-    - args: [number]
-    - output: sign(number)",
+- args: [number]
+- output: sign(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1313,8 +1351,8 @@ new RunGML_Op("abs",
 		return abs(_l[0]);
 	},
 @"Returns the absolute value of a number
-    - args: [number]
-    - output: abs(number)",
+- args: [number]
+- output: abs(number)",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric")
 	]
@@ -1325,8 +1363,8 @@ new RunGML_Op("clamp",
 		return clamp(_l[0], _l[1], _l[2]);
 	},
 @"Clamp a number between a minimum and maximum value
-    - args: [number, min, max]
-    - output: number",
+- args: [number, min, max]
+- output: number",
 	[
 		new RunGML_Constraint_ArgCount("eq", 3),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1338,8 +1376,8 @@ new RunGML_Op("lerp",
 		return lerp(_l[0], _l[1], _l[2]);
 	},
 @"Lerp between two numbers by a given amount
-    - args: [min, max, fraction]
-    - output: number",
+- args: [min, max, fraction]
+- output: number",
 	[
 		new RunGML_Constraint_ArgCount("eq", 3),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1351,8 +1389,8 @@ new RunGML_Op("map_range",
 		return (_l[0] - _l[1]) * (_l[4] - _l[3]) / (_l[2] - _l[1]) + _l[3];
 	},
 @"Map a value proportionally from one range to another
-    - args: [number, in_min, in_max, out_min, out_max]
-    - output: number",
+- args: [number, in_min, in_max, out_min, out_max]
+- output: number",
 	[
 		new RunGML_Constraint_ArgCount("eq", 5),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1366,8 +1404,8 @@ new RunGML_Op("approach",
 		return _val;
 	},
 @"Increment a number by some amount while staying within a range
-    - args: [number, increment, min, max]
-    - output: [number]",
+- args: [number, increment, min, max]
+- output: [number]",
 	[
 		new RunGML_Constraint_ArgCount("eq", 4),
 		new RunGML_Constraint_ArgType("all", "numeric")
@@ -1386,11 +1424,11 @@ new RunGML_Op("rand",
 		return random_range(_min, _max);
 	},
 @"Return a random value.  Behavior depends on the number of arguments:
-        - 0: Return a value between 0 and 1 (inclusive)
-		- 1: Return a value between 0 and arg0 (inclusive)
-		- 2: Return a value between arg0 and arg1 (inclusive)
-    - args: [(max=1)]
-    - output: number",
+0. Return a value between 0 and 1 (inclusive)
+1. Return a value between 0 and arg0 (inclusive)
+2. Return a value between arg0 and arg1 (inclusive)
+- args: [(max=1)]
+- output: number",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric", false),
 		new RunGML_Constraint_ArgType(1, "numeric", false),
@@ -1408,11 +1446,11 @@ new RunGML_Op("rand_int",
 		return irandom_range(_min, _max);
 	},
 @"Return a random integer.  Behavior depends on the number of arguments:
-        - 0: Return either 0 or 1
-		- 1: Return an integer between 0 and arg0 (inclusive)
-		- 2: Return an integer between arg0 and arg1 (inclusive)
-    - args: [(max=1)]
-    - output: number",
+0. Return either 0 or 1
+1. Return an integer between 0 and arg0 (inclusive)
+2. Return an integer between arg0 and arg1 (inclusive)
+- args: [(max=1)]
+- output: number",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric", false),
 		new RunGML_Constraint_ArgType(1, "numeric", false),
@@ -1425,8 +1463,8 @@ new RunGML_Op("rand_seed",
 		else randomise();
 	},
 @"Return a random value between 0 and some upper limit (defaults to 1).  Inclusive on both ends.
-    - args: [(max=1)]
-    - output: number",
+- args: [(max=1)]
+- output: number",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric", false)
 	]
@@ -1438,8 +1476,8 @@ new RunGML_Op("choose",
 		return _l[0][_index]
 	},
 @"Return a random element from a list.
-    - args: [(max=1)]
-    - output: number",
+- args: [(max=1)]
+- output: number",
 	[
 		new RunGML_Constraint_ArgType(0, "array")
 	]
@@ -1462,8 +1500,8 @@ new RunGML_Op("object",
 		return _inst;
 	},
 @"Create a new oRunGML_Object instance and return its index
-    - args: [x, y, depth/layer_name, event_dictionary]
-    - output: oRunGML_Object instance",
+- args: [x, y, depth/layer_name, event_dictionary]
+- output: oRunGML_Object instance",
 	[
 		new RunGML_Constraint_ArgCount("eq", 4),
 		new RunGML_Constraint_ArgType(0, "numeric"),
@@ -1486,9 +1524,8 @@ new RunGML_Op("create",
 		}
 	},
 @"Create a new object instance
-    - args: [x, y, depth/layer_name, object_name]
-    - output: [instance_id]"
-	,
+- args: [x, y, depth/layer_name, object_name]
+- output: [instance_id]",
 	[
 		new RunGML_Constraint_ArgCount("eq", 4),
 		new RunGML_Constraint_ArgType(0, "numeric"),
@@ -1503,8 +1540,8 @@ new RunGML_Op("destroy",
 		instance_destroy(_l[0]);
 	},
 @"Destroy an instance
-    - args: [instance_id]
-    - output: []"
+- args: [instance_id]
+- output: []"
 )
 
 #endregion Objects
@@ -1601,8 +1638,8 @@ new RunGML_Op("point_dist",
 		return point_distance(_l[0], _l[1], _l[2], _l[3]);
 	},
 @"Find the distance between two points
-    - args: [x1, y1, x2, y2]
-    - output: distance"
+- args: [x1, y1, x2, y2]
+- output: distance"
 )
 
 new RunGML_Op("point_dir",
@@ -1610,8 +1647,8 @@ new RunGML_Op("point_dir",
 		return point_direction(_l[0], _l[1], _l[2], _l[3]);
 	},
 @"Find the direction from one point to another
-    - args: [x1, y1, x2, y2]
-    - output: distance"
+- args: [x1, y1, x2, y2]
+- output: distance"
 )
 
 new RunGML_Op("lendir_x",
@@ -1619,8 +1656,8 @@ new RunGML_Op("lendir_x",
 		return lengthdir_x(_l[0], _l[1]);
 	},
 @"Find the x component for a given vector
-    - args: [length, direction]
-    - output: x_component"
+- args: [length, direction]
+- output: x_component"
 )
 
 new RunGML_Op("lendir_y",
@@ -1628,8 +1665,8 @@ new RunGML_Op("lendir_y",
 		return lengthdir_y(_l[0], _l[1]);
 	},
 @"Find the y component for a given vector
-    - args: [length, direction]
-    - output: y_component"
+- args: [length, direction]
+- output: y_component"
 )
 
 #endregion Distance & Direction
@@ -1671,8 +1708,9 @@ new RunGML_Op("room",
 		}
 	},
 @"Behavior depends on the number of arguments:
-        - 0: Return the name of the current room
-		- 1: Go to the named room, if it exists
+
+0. Return the name of the current room
+1. Go to the named room, if it exists
     - args: [(room_name)]
     - output: [(room_name)]"
 )
@@ -1753,8 +1791,8 @@ new RunGML_Op("draw_text",
 		draw_text(_l[0], _l[1], _l[2]);
 	},
 @"Draw text
-    - args: [x, y, string]
-    - output: []",
+- args: [x, y, string]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("eq", 3),
 		new RunGML_Constraint_ArgType(0, "numeric"),
@@ -1769,8 +1807,8 @@ new RunGML_Op("draw_sprite",
 		draw_sprite(_l[0], _l[1], _l[2], _l[3]);
 	},
 @"Draw a sprite
-    - args: [sprite_index, frame, x, y]
-    - output: []"
+- args: [sprite_index, frame, x, y]
+- output: []"
 )
 	
 new RunGML_Op("draw_sprite_general",
@@ -1779,8 +1817,8 @@ new RunGML_Op("draw_sprite_general",
 		draw_sprite_general(_l[0], _l[1], _l[2], _l[3], _l[4], _l[5], _l[6], _l[7], _l[8], _l[9], _l[10], _l[11], _l[12], _l[13], _l[14], _l[15])	
 	},
 @"Draw a sprite using additional parameters
-    - args: [sprite_index, frame, left, top, width, height, x, y, xscale, yscale, rot, c1, c2, c3, c4, alpha]
-    - output: []"
+- args: [sprite_index, frame, left, top, width, height, x, y, xscale, yscale, rot, c1, c2, c3, c4, alpha]
+- output: []"
 )
 
 new RunGML_Op("draw_point",
@@ -1793,8 +1831,8 @@ new RunGML_Op("draw_point",
 		} else draw_point(_l[0], _l[1]);
 	},
 @"Draw a point
-    - args: [x, y, (color)]
-    - output: []",
+- args: [x, y, (color)]
+- output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "numeric"),
@@ -1818,8 +1856,8 @@ new RunGML_Op("draw_line",
 		draw_line_color(_l[0], _l[1], _l[2], _l[3], _c_center, _c_edge);
 	},
 @"Draw a line
-    - args: [x1, y1, x2, y2, (color), (color2)]
-    - output: []",
+- args: [x1, y1, x2, y2, (color), (color2)]
+- output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "numeric"),
@@ -1854,8 +1892,8 @@ new RunGML_Op("draw_circle",
 		draw_circle_color(_l[0], _l[1], _r, _c_center, _c_edge, _outline);
 	},
 @"Draw a circle
-    - args: [x, y, (r=1), (outline=false), (c_center=draw_color), (c_edge=draw_color)]
-    - output: []",
+- args: [x, y, (r=1), (outline=false), (c_center=draw_color), (c_edge=draw_color)]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("in", [3, 4, 5, 6]),
 		new RunGML_Constraint_ArgType(0, "numeric"),
@@ -1886,8 +1924,8 @@ new RunGML_Op("draw_ellipse",
 		draw_ellipse_color(_l[0], _l[1], _l[2], _l[3], _c_center, _c_edge, _outline);
 	},
 @"Draw an ellipse
-    - args: [x1, y1, x2, y2, (outline=false), (c_center=draw_color), (c_edge=draw_color)]
-    - output: []",
+- args: [x1, y1, x2, y2, (outline=false), (c_center=draw_color), (c_edge=draw_color)]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("in", [3, 4, 5, 6]),
 		new RunGML_Constraint_ArgType(0, "numeric"),
@@ -1923,8 +1961,8 @@ new RunGML_Op("draw_rect",
 		draw_rectangle_color(_l[0], _l[1], _l[2], _l[3], _c1, _c2, _c3, _c4, _outline)
 	},
 @"Draw a rectangle
-    - args: [x1, y1, x2, y2, (outline=false), (c1=draw_color), (c2=c1, c3=c1, c4=c1)]
-    - output: []",
+- args: [x1, y1, x2, y2, (outline=false), (c1=draw_color), (c2=c1, c3=c1, c4=c1)]
+- output: []",
 	[
 		new RunGML_Constraint_ArgCount("in", [4, 5, 6, 9]),
 		new RunGML_Constraint_ArgType(0, "numeric"),
@@ -1946,8 +1984,8 @@ new RunGML_Op("draw_color",
 		return [];
 	},
 @"Get or set the draw color.
-    - args: [(color)]
-    - output: (color)",
+- args: [(color)]
+- output: (color)",
 	[new RunGML_Constraint_ArgType(0, "numeric", false)]
 )
 	
@@ -1958,8 +1996,8 @@ new RunGML_Op("draw_alpha",
 		return [];
 	},
 @"Get or set the draw alpha.
-    - args: [(alpha)]
-    - output: (alpha)",
+- args: [(alpha)]
+- output: (alpha)",
 	[new RunGML_Constraint_ArgType(0, "numeric", false)]
 )
 
@@ -1973,9 +2011,9 @@ new RunGML_Op("draw_font",
 		return [];
 	},
 @"Get or set the draw font.
-    - args: [(font)]
-    - output: (font)",
-	[new RunGML_Constraint_ArgCount("leq", 1)]
+- args: [(font name or asset reference)]
+- output: (font asset reference)",
+	[new RunGML_Constraint_ArgType(0, ["string", "ref"])]
 )
 	
 new RunGML_Op("draw_halign",
@@ -2001,8 +2039,8 @@ new RunGML_Op("draw_halign",
 		return [];
 	},
 @"Get or set the horizontal draw alignment
-    - args: [(value)]
-    - output: (value)"
+- args: [(value)]
+- output: (value)"
 )
 	
 new RunGML_Op("draw_valign",
@@ -2031,8 +2069,8 @@ new RunGML_Op("draw_valign",
 		}
 	},
 @"Get or set the vertical draw alignment
-    - args: [(value)]
-    - output: (value)"
+- args: [(value)]
+- output: (value)"
 )
 
 new RunGML_Op("draw_format",
@@ -2061,9 +2099,9 @@ new RunGML_Op("draw_format",
 			])
 		}
 	},
-@"Get or set the draw font, h_align, v_align, color, and alpha simultaneously.
-    - args: [([font, h_align, v_align, color, alpha])]
-    - output: ([font, h_align, v_align, color, alpha])",
+@"Get or set the draw font, horizontal alignment, vertical alignment, color, and alpha simultaneously.  Use to backup/restore settings before/after drawing to isolate changes.
+- args: [([font, h_align, v_align, color, alpha])]
+- output: ([font, h_align, v_align, color, alpha])",
 	[new RunGML_Constraint_ArgCount("leq", 1)]
 )
 	
@@ -2072,8 +2110,8 @@ new RunGML_Op("rgb",
 		return make_color_rgb(_l[0], _l[1], _l[2]);	
 	},
 @"Create an RGB color
-    - args: [red, green, blue]
-    - output: color"
+- args: [red, green, blue]
+- output: color"
 )
 	
 new RunGML_Op("hsv",
@@ -2081,8 +2119,8 @@ new RunGML_Op("hsv",
 		return make_color_hsv(_l[0], _l[1], _l[2]);	
 	}, 
 @"Create an HSV color
-    - args: [hue, saturation, value]
-    - output: color"
+- args: [hue, saturation, value]
+- output: color"
 )
 
 new RunGML_Op("color",
@@ -2099,8 +2137,8 @@ new RunGML_Op("color",
 		return _color;
 	}, 
 @"Create a color by name or hex code
-    - args: [string]
-    - output: color",
+- args: [string]
+- output: color",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 
@@ -2109,8 +2147,8 @@ new RunGML_Op("color_merge",
 		return merge_color(_l[0], _l[1], _l[2]);
 	},
 @"Merge two colors by some amount
-    - args: [color1, color2, fraction]
-    - output: color3",
+- args: [color1, color2, fraction]
+- output: color3",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "numeric"),
@@ -2123,8 +2161,8 @@ new RunGML_Op("color_rand",
 		return random_range(0, 16777216);
 	},
 @"Create a random color
-    - args: []
-    - output: color",
+- args: []
+- output: color",
 )
 
 new RunGML_Op("color_inv",
@@ -2136,8 +2174,8 @@ new RunGML_Op("color_inv",
 		return make_color_rgb(255-_r, 255-_g, 255-_b);
 	},
 @"Create a random color
-    - args: []
-    - output: color",
+- args: []
+- output: color",
 )
 	
 #endregion Drawing
@@ -2201,8 +2239,8 @@ new RunGML_Op("delta",
 		return delta_time / 1000000.0;
 	},
 @"Return the time elapsed since the previous frame in seconds
-    - args: []
-    - output: number"
+- args: []
+- output: number"
 )
 
 new RunGML_Op("fps",
@@ -2210,8 +2248,8 @@ new RunGML_Op("fps",
 		return fps;
 	}, 
 @"Get the current fps (capped at the room speed)
-    - args: []
-    - output: fps"
+- args: []
+- output: fps"
 )
 	
 new RunGML_Op("fps_real",
@@ -2219,8 +2257,8 @@ new RunGML_Op("fps_real",
 		return fps_real;
 	}, 
 @"Get the current fps (not capped at the room speed)
-    - args: []
-    - output: fps_real"
+- args: []
+- output: fps_real"
 )
 	
 new RunGML_Op("game_speed",
@@ -2231,8 +2269,8 @@ new RunGML_Op("game_speed",
 		} else return game_get_speed(gamespeed_fps);
 	}, 
 @"Get or set the game speed in terms of fps
-    - args: [(game_speed)]
-    - output: (game_speed)"
+- args: [(game_speed)]
+- output: (game_speed)"
 )
 
 #endregion Time
@@ -2275,8 +2313,8 @@ new RunGML_Op("nth",
 		}
 	},
 @"Get the ordinal suffix for a given number
-    - args: [number]
-    - output: 'st', 'nd', 'rd', or 'th'"
+- args: [number]
+- output: 'st', 'nd', 'rd', or 'th'"
 )
 	
 new RunGML_Op("quit",
@@ -2285,8 +2323,8 @@ new RunGML_Op("quit",
 		return [];
 	}, 
 @"Quit the game
-    - args: []
-    - output: []"
+- args: []
+- output: []"
 )
 
 new RunGML_Op("asset",
@@ -2294,8 +2332,8 @@ new RunGML_Op("asset",
 		return asset_get_index(_l[0])
 	},
 @"Return the index of the named asset
-    - args: [asset_name]
-    - output: index",
+- args: [asset_name]
+- output: index",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 
@@ -2304,8 +2342,8 @@ new RunGML_Op("cursor",
 		return [mouse_x, mouse_y]
 	},
 @"Return the cursor's coordinates
-    - args: []
-    - output: [mouse_x, mouse_y]"
+- args: []
+- output: [mouse_x, mouse_y]"
 )
 
 new RunGML_Op("near_cursor",
@@ -2318,8 +2356,8 @@ new RunGML_Op("near_cursor",
 		return instance_nearest(mouse_x, mouse_y, _obj);
 	},
 @"Return index of instance nearest to the mouse.  Optional argument specifies an object index or asset name.
-    - args: [(object_index/asset_name)]
-    - output: index",
+- args: [(object_index/asset_name)]
+- output: index",
 	[new RunGML_Constraint_ArgType(0, "alphanumeric", false)]
 )
 
@@ -2340,8 +2378,8 @@ new RunGML_Op("near",
 		return instance_nearest(_x, _y, _obj);
 	},
 @"Return index of instance (arg2) nearest to some coordinates (arg0, arg1).
-    - args: [(x=mouse_x), (y=mouse_y), (obj=any)]
-    - output: index",
+- args: [(x=mouse_x), (y=mouse_y), (obj=any)]
+- output: index",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric", false),
 		new RunGML_Constraint_ArgType(0, "numeric", false),
@@ -2355,8 +2393,8 @@ new RunGML_Op("rickroll",
 		return [];
 	},
 @"Got 'em!
-    - args: []
-    - output: []"
+- args: []
+- output: []"
 )
 
 new RunGML_Op ("test_constant", 23);
