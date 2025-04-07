@@ -216,8 +216,6 @@ This library includes two template objects, `oRunGML_Object` and `oRunGML_Object
 
 ## Operator Definitions
 
-### Constraints
+See the [manual](manual.md) for full documentation of supported operators ane aliases.
 
-### Documentation
-
-### Aliases
+Additional operators should be defined in the `RunGML_ConfigOps()` function in the [scrRunGML_Config](src/scripts/scrRunGML_Config/scrRunGML_Config.gml) script, which includes an example definition that can be copied as a template.
