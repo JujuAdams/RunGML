@@ -249,4 +249,6 @@ The list of constraints is optional.  If present, it should contain `RunGML_Cons
 
 Custom aliases can be added from anywhere using RunGML_alias("nickname", "operator_name").  They also *should* be defined in RunGML_ConfigOps().
 
-Documentation for custom operators and aliases will automatically become available via `"help"` and `"manual"`.
+Any constraints and aliases will be appended to the docstring automatically when viewing with `"help"` or `"manual"`.
+
+Documentation for custom operators and aliases will automatically become available via `"help"` and `"manual"` when they are defined.
