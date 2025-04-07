@@ -212,7 +212,8 @@ Combining quote types in this way is not advised.  Consistent use of single quot
 ## Objects
 
 This library includes two template objects, `oRunGML_Object` and `oRunGML_ObjectTemplate`.
-- `oRunGML_Object` provides only barebones functionality
+- `oRunGML_Object` provides only barebones functionality and is not directly useful.
+- `oRunGML_ObjectTemplate` inherits from `oRunGML_Object` and sets up most events to execute RunGML programs passed through the event dictionary of the `"object"` operator.
 
 ## Operator Definitions
 
