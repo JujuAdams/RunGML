@@ -17,7 +17,7 @@ In addition to the RunGML language definition and interpreter, this library also
 - An [interactive console](#console)
 - A [template object](#objects) with events pre-defined to execute RunGML programs
 - A test room, test object, and example programs to demonstrate basic functionality
-- Thorough documentation that can be read in [`scrRunGML`](src/scripts/scrRunGML/scrRunGML.gml) or accessed using `"help"` and `"manual`"
+- Thorough documentation that can be accessed using `"help"` or `"manual`.  The latter generates markdown-formatted documentation for all operators, a copy of which is included here as [manual.md](manual.md).
 
 ## Running Programs
 
