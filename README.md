@@ -212,10 +212,10 @@ Combining quote types in this way is not advised.  Consistent use of single quot
 ### Console Keyboard Shortcuts
 
 The console supports the following bash-style keyboard shortcuts:
-- Control-C: Clear the current input
-- Control-L: Clear the history
-- Control-A: Move the cursor to the start of the current input
-- Control-E: Move the cursor to the end of the current input
+- **Control-C:** Clear the current input
+- **Control-L:** Clear the history
+- **Control-A:** Move the cursor to the start of the current input
+- **Control-E:** Move the cursor to the end of the current input
 
 Note that any other inputs will be ignored while Control is held.
 
