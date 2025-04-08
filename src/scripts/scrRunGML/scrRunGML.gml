@@ -1786,8 +1786,8 @@ new RunGML_Op("display_w",
 		return display_get_width();	
 	},
 @"Returns the width of the display.
-    - args: []
-    - output: [width]"
+- args: []
+- output: [width]"
 )
 	
 new RunGML_Op("display_h",
@@ -1796,8 +1796,8 @@ new RunGML_Op("display_h",
 		return display_get_height();
 	},
 @"Returns the height of the display.
-    - args: []
-    - output: [height]"
+- args: []
+- output: [height]"
 )
 
 new RunGML_Op("display_gui_w",
@@ -1806,8 +1806,8 @@ new RunGML_Op("display_gui_w",
 		return display_get_gui_width();	
 	},
 @"Returns the width of the display GUI.
-    - args: []
-    - output: [width]"
+- args: []
+- output: [width]"
 )
 	
 new RunGML_Op("display_gui_h",
@@ -1816,8 +1816,8 @@ new RunGML_Op("display_gui_h",
 		return display_get_gui_height();
 	},
 @"Returns the height of the display GUI.
-    - args: []
-    - output: [height]"
+- args: []
+- output: [height]"
 )
 
 new RunGML_Op("fullscreen",
@@ -1828,8 +1828,8 @@ new RunGML_Op("fullscreen",
 		return [];
 	},
 @"Toggle fullscreen mode.  Set status with a single boolean argument, or swap status with no arguments.
-    - args: [(bool)]
-    - output: []"
+- args: [(bool)]
+- output: []"
 )
 
 #endregion Displays
@@ -2247,8 +2247,8 @@ new RunGML_Op ("shader",
 		}
 	},
 @"Get or set the current shader. Zero arguments to get, one to set.
-    - args: [(shader)]
-    - output: [(shader)]",
+- args: [(shader)]
+- output: [(shader)]",
 	[
 		new RunGML_Constraint_ArgType(0, "alphanumeric", false)
 	]
@@ -2259,8 +2259,8 @@ new RunGML_Op ("shader_reset",
 		shader_reset();
 	},
 @"Clear shaders
-    - args: []
-    - output: []"
+- args: []
+- output: []"
 )
 
 //new RunGML_Op ("shader_uniform_f",
@@ -2336,8 +2336,8 @@ new RunGML_Op("url_open",
 		return [];
 	},
 @"Open a URL in the default browser
-    - args: [URL]
-    - output: []",
+- args: [URL]
+- output: []",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 #endregion Network

@@ -183,23 +183,23 @@ Destroy an instance
 
 ### display_gui_h
 Returns the height of the display GUI.
-    - args: []
-    - output: [height]
+- args: []
+- output: [height]
 
 ### display_gui_w
 Returns the width of the display GUI.
-    - args: []
-    - output: [width]
+- args: []
+- output: [width]
 
 ### display_h
 Returns the height of the display.
-    - args: []
-    - output: [height]
+- args: []
+- output: [height]
 
 ### display_w
 Returns the width of the display.
-    - args: []
-    - output: [width]
+- args: []
+- output: [width]
 
 ### div
 Divide two numbers
@@ -416,8 +416,8 @@ Returns the fractional portion of a number
 
 ### fullscreen
 Toggle fullscreen mode.  Set status with a single boolean argument, or swap status with no arguments.
-    - args: [(bool)]
-    - output: []
+- args: [(bool)]
+- output: []
 
 ### game_speed
 Get or set the game speed in terms of fps
@@ -879,15 +879,15 @@ Run a program from a file in the incdlued RunGML/programs directory
 
 ### shader
 Get or set the current shader. Zero arguments to get, one to set.
-    - args: [(shader)]
-    - output: [(shader)]
+- args: [(shader)]
+- output: [(shader)]
 - constraints:
     - typeof(args[0]) in [ "string","number","int32","int64" ] (optional)
 
 ### shader_reset
 Clear shaders
-    - args: []
-    - output: []
+- args: []
+- output: []
 
 ### sign
 Returns the sign of a number (1 if positive, -1 if negative)
@@ -985,8 +985,8 @@ Returns the RunGML web address
 
 ### url_open
 Open a URL in the default browser
-    - args: [URL]
-    - output: []
+- args: [URL]
+- output: []
 - constraints:
     - typeof(args[0]) in [ "string" ] (required)
 
