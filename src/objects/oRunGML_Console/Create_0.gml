@@ -11,9 +11,10 @@ RunGMLI.throw_errors = true;
 last_created = noone;
 
 toggle_key = global.RunGML_Console_toggleKey;
-backspace_key = vk_backspace;
+meta_key = vk_control;
 float_precision = global.RunGML_Console_floatPrecision;
 
+dt = 0;
 age = 0;
 
 prompt = "> ";
@@ -28,6 +29,9 @@ command_history_pos = -1;
 command_history_max = 100;
 pause_game = global.RunGML_Console_doPause;
 
+backspace_hold_delay = 0.5;
+backspace_hold_cooldown = backspace_hold_delay;
+backspace_hold_rate = 0.1;
 
 text_color = c_lime;
 text_alpha = 1.0;
@@ -51,6 +55,8 @@ alphabet = [
 	",", ".", "/", "<", ">", "?", " ", ":", ";", "'", "\"", 
 	"[", "]", "{", "}", "|", "\\", "\t"
 ];
+
+separators = [" ", ",", ".", ":", ";", "'", "\"", "_", "-", "<", ">", "[", "]", "{", "}"]
 
 toggle = function(_set=!enabled) {
 	enabled = _set;

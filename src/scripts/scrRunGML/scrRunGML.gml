@@ -245,18 +245,20 @@ function RunGML_clone(_l) {
 	return json_parse(json_stringify(_l));	
 }
 
-
 function RunGML_color(_name, _color) {
 // Add a new color definition
 	struct_set(global.RunGML_Colors	, _name, _color)
 }
-
 
 /* Operator Definitions
 Additional operators should be defined in scrRunGML_Config
 Make a backup of that file before updating RunGML
 Then you can restore your custom settings and operators after updating
 */
+
+global.test = function(_a, _b) {
+	return _a/_b
+}
 
 global.RunGML_Ops = {}
 global.RunGML_Aliases = {}
@@ -622,6 +624,20 @@ new RunGML_Op ("exec",
 		new RunGML_Constraint_ArgType(0, "string")
 	]
 )
+
+new RunGML_Op ("do",
+	function(_i, _l=[]) {
+		if array_length(_l) < 2 _l[1] = [];
+		return method_call(_l[0], _l[1]);
+	},
+@"Execute a function
+- args: [function, ([args])]
+- output: *",
+	[
+		new RunGML_Constraint_ArgType(0, "method"),
+		new RunGML_Constraint_ArgType(1, "array", false)
+	]
+)
 	
 new RunGML_Op ("last",
 	function(_i, _l) {
@@ -821,6 +837,17 @@ new RunGML_Op("repeat",
 	]
 )
 
+new RunGML_Op("quit",
+	function(_i, _l) {
+		game_end();
+		return [];
+	}, 
+@"Quit the game
+- args: []
+- output: []"
+)
+
+
 #endregion Control Flow
 	
 #region Debugging
@@ -863,6 +890,30 @@ new RunGML_Op ("cat",
 @"Concatenate arguments into a single string
     - args: [value, (...)]
     - output: [string]",
+)
+
+new RunGML_Op("nth",
+	function(_i, _l) {
+		var _n = abs(_l[0])
+		var _mod100 = _n mod 100
+		if _mod100 >= 4 and _mod100 <= 20 {
+			return "th";
+		}
+		
+		switch(_n mod 10){
+			case 1:
+				return "st";
+			case 2:
+				return "nd";
+			case 3:
+				return "rd";
+			default:
+				return "th";
+		}
+	},
+@"Get the ordinal suffix for a given number
+- args: [number]
+- output: 'st', 'nd', 'rd', or 'th'"
 )
 
 #endregion Strings
@@ -2291,51 +2342,7 @@ new RunGML_Op("url_open",
 )
 #endregion Network
 
-#region Misc
-
-new RunGML_Op("nth",
-	function(_i, _l) {
-		var _n = abs(_l[0])
-		var _mod100 = _n mod 100
-		if _mod100 >= 4 and _mod100 <= 20 {
-			return "th";
-		}
-		
-		switch(_n mod 10){
-			case 1:
-				return "st";
-			case 2:
-				return "nd";
-			case 3:
-				return "rd";
-			default:
-				return "th";
-		}
-	},
-@"Get the ordinal suffix for a given number
-- args: [number]
-- output: 'st', 'nd', 'rd', or 'th'"
-)
-	
-new RunGML_Op("quit",
-	function(_i, _l) {
-		game_end();
-		return [];
-	}, 
-@"Quit the game
-- args: []
-- output: []"
-)
-
-new RunGML_Op("asset",
-	function(_i, _l) {
-		return asset_get_index(_l[0])
-	},
-@"Return the index of the named asset
-- args: [asset_name]
-- output: index",
-	[new RunGML_Constraint_ArgType(0, "string")]
-)
+#region Cursor
 
 new RunGML_Op("cursor",
 	function(_i, _l) {
@@ -2387,6 +2394,30 @@ new RunGML_Op("near",
 	]
 )
 
+#endregion Cursor
+
+#region Misc
+
+new RunGML_Op("asset",
+	function(_i, _l) {
+		return asset_get_index(_l[0])
+	},
+@"Return the index of the named asset
+- args: [asset_name]
+- output: index",
+	[new RunGML_Constraint_ArgType(0, "string")]
+)
+
+new RunGML_Op("type",
+	function(_i, _l) {
+		return typeof(_l[0])
+	},
+@"Return the type of a variable
+- args: [*]
+- output: type_name",
+	[new RunGML_Constraint_ArgCount("eq", 1)]
+)
+
 new RunGML_Op("rickroll",
 	function(_i, _l) {
 		url_open("https://sdlwdr.github.io/rickroll/rickroll.mp4");
@@ -2401,9 +2432,10 @@ new RunGML_Op ("test_constant", 23);
 #endregion Misc
 
 #region Aliases
-// "e" reserved for mathematical constant
+// "e" is reserved for the mathematical constant
 RunGML_alias("g", "global");
 RunGML_alias("i", "inst");
+RunGML_alias("l", "list");
 RunGML_alias("o", "object");
 RunGML_alias("p", "parent");
 RunGML_alias("q", "quit");

@@ -47,8 +47,8 @@ function RunGML_ConfigOps() {
 			return "Hello, Config!"
 		},
 @"Test operator
-	- args: []
-	- output: string",
+- args: []
+- output: string",
 		[new RunGML_Constraint_ArgCount("geq", 0)]
 	)
 
