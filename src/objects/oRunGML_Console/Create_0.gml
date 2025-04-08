@@ -29,9 +29,16 @@ command_history_pos = -1;
 command_history_max = 100;
 pause_game = global.RunGML_Console_doPause;
 
-backspace_hold_delay = 0.5;
-backspace_hold_cooldown = backspace_hold_delay;
-backspace_hold_rate = 0.1;
+key_hold_delay = 0.5;
+key_hold_rate = 0.1;
+key_hold_cooldown = {
+	"backspace": key_hold_delay,
+	"delete": key_hold_delay,
+	"left": key_hold_delay,
+	"right": key_hold_delay,
+	"up": key_hold_delay,
+	"down": key_hold_delay
+}
 
 text_color = c_lime;
 text_alpha = 1.0;
@@ -141,4 +148,89 @@ backspace = function() {
 		current_line = string_delete(current_line, cursor_pos-1, 1);
 		cursor_pos -= 1;
 	}
+}
+
+delete_char = function(){
+	current_line = string_delete(current_line, cursor_pos, 1);
+	cursor_pos = max(1, min(string_length(current_line) + 1, cursor_pos));
+}
+
+cursor_left = function(_amt=1) {
+	cursor_pos = max(1, cursor_pos - _amt);
+}
+		
+cursor_right = function(_amt=1) {
+	cursor_pos = min(string_length(current_line) + 1, cursor_pos + _amt);
+}
+
+history_prev = function() {
+	if array_length(command_history) < 1 return false;
+	command_history_pos--;
+	if command_history_pos < 0 {
+		command_history_pos = array_length(command_history) - 1;
+	}
+	current_line = command_history[command_history_pos];
+	cursor_pos = string_length(current_line) + 1;
+	return true;
+}
+
+history_next = function() {
+	if array_length(command_history) < 1 return false;
+	command_history_pos++;
+	if command_history_pos >= array_length(command_history) {
+		command_history_pos = -1;
+		current_line = "";
+		cursor_pos = 1;
+	}
+	try {
+		current_line = command_history[command_history_pos];
+	} catch(_e) {
+		current_line = "";	
+	}
+	cursor_pos = string_length(current_line) + 1;
+}
+
+enter = function() {
+	log_line(prompt + string(current_line));
+	var n_command_history = array_length(command_history)
+	if n_command_history > 0 {
+		if current_line != command_history[n_command_history-1] {
+			array_push(command_history, current_line);
+			if array_length(command_history) > command_history_max {
+				array_delete(command_history, 0, 1);
+			}
+		}
+	} else {
+		array_push(command_history, current_line);
+	}
+	try {
+		exec_line(current_line);
+	} catch(_e) {
+		log_string(_e);	
+	}
+	clear_line();
+	command_history_pos = -1;
+}	
+
+
+key_hold_check_and_update = function(_keybind, _name, _f, _args=[]) {
+	if keyboard_check(_keybind) {
+		if keyboard_check_pressed(_keybind) {
+			method_call(_f, _args)
+			struct_set(key_hold_cooldown, _name, key_hold_delay);
+			return true;
+		} else {
+			var _old = struct_get(key_hold_cooldown, _name)
+			var _new = _old - dt;
+			
+			if _new <= 0 {
+				method_call(_f, _args);
+				struct_set(key_hold_cooldown, _name, key_hold_rate);	
+				return true;
+			} else struct_set(key_hold_cooldown, _name, _new);
+		}
+	} else {
+		 struct_set(key_hold_cooldown, _name, key_hold_delay);
+	}
+	return false;
 }

@@ -104,10 +104,11 @@ function RunGML_Constraint_ArgCount(_op="eq", _count=noone) : RunGML_Constraint(
 	}
 }
 
-function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true): RunGML_Constraint() constructor {
+function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true, _strict_bool=false): RunGML_Constraint() constructor {
 	index = _index;
 	types = _types;
 	required = _required
+	strict_bool = _strict_bool;
 	if types == "numeric" types = ["number", "int32", "int64"];
 	if types == "alphanumeric" types = ["string", "number", "int32", "int64"];
 	if typeof(types) != "array" types = [types];
@@ -144,6 +145,15 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true): 
 			}
 			
 			if not array_contains(types, _type){
+				if !strict_bool and array_contains(types, "bool") {
+					try {
+						var _booled = bool(_val);
+						if typeof(_booled) == "bool" {
+							_l[index] = _booled;
+							return true;
+						}
+					} catch(_e){}
+				}
 				return new RunGML_Error(string(err_msg, _l, doc(), _type));
 			}
 		}
@@ -1535,6 +1545,102 @@ new RunGML_Op("choose",
 )
 
 #endregion Math
+
+#region Trigonometry
+new RunGML_Op("sin",
+	function(_i, _l) {
+		var _degrees = true;
+		var _inverse = false;
+		if array_length(_l) > 1 {
+			_degrees = _l[1];
+			if array_length(_l) > 2 _inverse = _l[2];
+		}
+		
+		if _degrees {
+			if _inverse return darcsin(_l[0]);
+			else return dsin(_l[0])
+		} else {
+			if _inverse return arcsin(_l[0]);
+			else return sin(_l[0])
+		}
+	},
+@"Return the sine of an angle in raidans.
+- args: [angle]
+- output: sin/dsin/arcsin/darcsin(angle)",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "bool", false),
+		new RunGML_Constraint_ArgType(2, "bool", false)
+	]
+)
+
+new RunGML_Op("cos",
+	function(_i, _l) {
+		var _degrees = true;
+		var _inverse = false;
+		if array_length(_l) > 1 {
+			_degrees = _l[1];
+			if array_length(_l) > 2 _inverse = _l[2];
+		}
+		
+		if _degrees {
+			if _inverse return darccos(_l[0]);
+			else return dcos(_l[0])
+		} else {
+			if _inverse return arccos(_l[0]);
+			else return cos(_l[0])
+		}
+	},
+@"Return the cosine of an angle in raidans.
+- args: [angle]
+- output: cos/dcos/arccos/darccos(angle)",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "bool", false),
+		new RunGML_Constraint_ArgType(2, "bool", false)
+	]
+)
+
+new RunGML_Op("tan",
+	function(_i, _l) {
+		var _degrees = true;
+		var _inverse = false;
+		if array_length(_l) > 1 {
+			_degrees = _l[1];
+			if array_length(_l) > 2 _inverse = _l[2];
+		}
+		
+		if _degrees {
+			if _inverse return darctan(_l[0]);
+			else return dtan(_l[0])
+		} else {
+			if _inverse return arctan(_l[0]);
+			else return tan(_l[0])
+		}
+	},
+@"Return the tangent of an angle in raidans.
+- args: [angle, (degrees=true), (inverse=false)]
+- output: tan/dtan/arctan/darctan(angle)",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "bool", false),
+		new RunGML_Constraint_ArgType(2, "bool", false)
+	]
+)
+
+new RunGML_Op("arctan2",
+	function(_i, _l) {
+		return arctan2(_l[0], _l[1]);
+	},
+@"Return arctan2 of an angle y/x. y = opposite side of triangle and x = adjacent side of triangle
+- args: [y, x]
+- output: arctan2(y, x)",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric")
+	]
+)
+#endregion Trigonometry
 	
 #region Objects
 
@@ -1690,7 +1796,11 @@ new RunGML_Op("point_dist",
 	},
 @"Find the distance between two points
 - args: [x1, y1, x2, y2]
-- output: distance"
+- output: distance",
+	[
+		new RunGML_Constraint_ArgCount("eq", 4),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
 )
 
 new RunGML_Op("point_dir",
@@ -1699,7 +1809,11 @@ new RunGML_Op("point_dir",
 	},
 @"Find the direction from one point to another
 - args: [x1, y1, x2, y2]
-- output: distance"
+- output: distance",
+	[
+		new RunGML_Constraint_ArgCount("eq", 4),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
 )
 
 new RunGML_Op("lendir_x",
@@ -1708,7 +1822,11 @@ new RunGML_Op("lendir_x",
 	},
 @"Find the x component for a given vector
 - args: [length, direction]
-- output: x_component"
+- output: x_component",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric")
+	]
 )
 
 new RunGML_Op("lendir_y",
@@ -1717,7 +1835,76 @@ new RunGML_Op("lendir_y",
 	},
 @"Find the y component for a given vector
 - args: [length, direction]
-- output: y_component"
+- output: y_component",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric")
+	]
+)
+
+new RunGML_Op("angle",
+	function(_i, _l) {
+		return angle_difference(_l[0], _l[1]);
+	},
+@"Find the shortest distance between two angles.
+- args: [end_angle, start_angle]
+- output: angle_difference",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "numeric")
+	]
+)
+
+new RunGML_Op("dot",
+	function(_i, _l) {
+		return dot_product(_l[0], _l[1], _l[2], _l[3]);
+	},
+@"Find the dot product of two 2d vectors
+- args: [x1, y1, x2, y2]
+- output: dot_product",
+	[
+		new RunGML_Constraint_ArgCount("eq", 4),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
+)
+
+new RunGML_Op("dot3",
+	function(_i, _l) {
+		return dot_product_3d(_l[0], _l[1], _l[2], _l[3], _l[4], _l[5]);
+	},
+@"Find the dot product of two 3d vectors
+- args: [x1, y1, z1, x2, y2, z2]
+- output: dot_product",
+	[
+		new RunGML_Constraint_ArgCount("eq", 6),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
+)
+
+new RunGML_Op("dot_norm",
+	function(_i, _l) {
+		return dot_product_normalised(_l[0], _l[1], _l[2], _l[3]);
+	},
+@"Find the normalised dot product of two 2d vectors
+- args: [x1, y1, x2, y2]
+- output: dot_product",
+	[
+		new RunGML_Constraint_ArgCount("eq", 4),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
+)
+
+new RunGML_Op("dot3_norm",
+	function(_i, _l) {
+		return dot_product_3d_normalised(_l[0], _l[1], _l[2], _l[3], _l[4], _l[5]);
+	},
+@"Find the normalised dot product of two 3d vectors
+- args: [x1, y1, z1, x2, y2, z2]
+- output: dot_product",
+	[
+		new RunGML_Constraint_ArgCount("eq", 6),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
 )
 
 #endregion Distance & Direction
@@ -2292,6 +2479,123 @@ new RunGML_Op("delta",
 @"Return the time elapsed since the previous frame in seconds
 - args: []
 - output: number"
+)
+
+new RunGML_Op("game_time",
+	function(_i, _l) {
+		return get_timer() / 1000000.0;
+	},
+@"Return the time in seconds since the game began
+- args: []
+- output: number"
+)
+
+new RunGML_Op("current",
+	function(_i, _l) {
+		if array_length(_l) < 1 return date_current_datetime();
+		switch(_l[0]) {
+			case "s":
+			case "sec":
+			case "second":
+				return current_second
+			case "m":
+			case "min":
+			case "minute":
+				return current_minute
+			case "h":
+			case "hr":
+			case "hour":
+				return current_hour
+			case "d":
+			case "day":
+				return current_day
+			case "w":
+			case "wd":
+			case "weekday":
+				return current_weekday
+			case "M":
+			case "month":
+				return current_month
+			case "y":
+			case "yr":
+			case "year":
+				return current_year
+			case "t":
+			case "time":
+			default:
+				return current_time
+		}
+	},
+@"Return the current time. Argument is a string specifying a date component: second/minute/hour/day/weekday/month/year, or s/m/h/d/w/M/y.  With no arguments, return the current datetime.
+- args: [('s'/'m'/'h'/'d'/'w'/'M'/'y')]
+- output: number",
+	[new RunGML_Constraint_ArgType(0, "string" ,false)]
+)
+
+new RunGML_Op("datetime",
+	function(_i, _l) {
+		return date_create_datetime(_l[0], _l[1], _l[2], _l[3], _l[4], _l[5]);
+	}, 
+@"Create a datetime value
+- args: [year, month, day, hour, minute, second]
+- output: datetime",
+	[
+		new RunGML_Constraint_ArgCount("eq", 6),
+		new RunGML_Constraint_ArgType("all", "numeric")
+	]
+)
+
+new RunGML_Op("datestring",
+	function(_i, _l) {
+		if array_length(_l) < 1 _l[0] = date_current_datetime();
+		return date_datetime_string(_l[0]);
+	}, 
+@"Create a string from a datetime value, or return the current datetime if no arguments are passed.
+- args: [(datetime)]
+- output: date_string",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric", false)
+	]
+)
+
+new RunGML_Op("date_get",
+	function(_i, _l) {
+		switch(_l[1]) {
+			case "s":
+			case "sec":
+			case "second":
+				return date_get_second(_l[0]);
+			case "m":
+			case "min":
+			case "minute":
+				return date_get_minute(_l[0]);
+			case "h":
+			case "hr":
+			case "hour":
+				return date_get_hour(_l[0]);
+			case "d":
+			case "day":
+				return date_get_day(_l[0]);
+			case "w":
+			case "wd":
+			case "weekday":
+				return date_get_weekday(_l[0]);
+			case "M":
+			case "month":
+				return date_get_month(_l[0]);
+			case "y":
+			case "yr":
+			case "year":
+				return date_get_year(_l[0]);
+		}
+	}, 
+@"Get the second, minute, hour, day, weekday, month, or year from a datetime value.
+- args: [datetime, 's'/'m'/'h'/'d'/'w'/'M'/'y']
+- output: number",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "string")
+	]
 )
 
 new RunGML_Op("fps",

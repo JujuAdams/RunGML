@@ -7,7 +7,7 @@ Version: 2025_04_05_00
 Homepage: https://github.com/sdelaughter/RunGML
 
 ## Operators & *Aliases*
-[*False*](#false), [*True*](#true), [abs](#abs), [add](#add), [alias](#alias), [and](#and), [approach](#approach), [array](#array), [array_get](#array_get), [asset](#asset), [cat](#cat), [ceil](#ceil), [choose](#choose), [clamp](#clamp), [clear](#clear), [color](#color), [color_inv](#color_inv), [color_merge](#color_merge), [color_rand](#color_rand), [console](#console), [create](#create), [cursor](#cursor), [dec](#dec), [delta](#delta), [destroy](#destroy), [display_gui_h](#display_gui_h), [display_gui_w](#display_gui_w), [display_h](#display_h), [display_w](#display_w), [div](#div), [*divide*](#div), [do](#do), [draw_alpha](#draw_alpha), [draw_circle](#draw_circle), [draw_color](#draw_color), [draw_ellipse](#draw_ellipse), [draw_font](#draw_font), [draw_format](#draw_format), [draw_halign](#draw_halign), [draw_line](#draw_line), [draw_point](#draw_point), [draw_rect](#draw_rect), [draw_sprite](#draw_sprite), [draw_sprite_general](#draw_sprite_general), [draw_text](#draw_text), [draw_valign](#draw_valign), [e](#e), [eq](#eq), [example](#example), [exec](#exec), [exp](#exp), [export](#export), [false](#false), [floor](#floor), [fps](#fps), [fps_real](#fps_real), [frac](#frac), [fullscreen](#fullscreen), [*g*](#global), [game_speed](#game_speed), [geq](#geq), [global](#global), [gm_version](#gm_version), [gt](#gt), [help](#help), [hsv](#hsv), [*i*](#inst), [if](#if), [import](#import), [in](#in), [inc](#inc), [inst](#inst), [*l*](#list), [last](#last), [len](#len), [lendir_x](#lendir_x), [lendir_y](#lendir_y), [leq](#leq), [lerp](#lerp), [list](#list), [log](#log), [lt](#lt), [manual](#manual), [map_range](#map_range), [max](#max), [min](#min), [mod](#mod), [mult](#mult), [*multiply*](#mult), [near](#near), [near_cursor](#near_cursor), [neq](#neq), [noone](#noone), [not](#not), [nth](#nth), [*o*](#object), [object](#object), [op_count](#op_count), [op_list](#op_list), [op_names](#op_names), [or](#or), [out](#out), [*p*](#parent), [parent](#parent), [pass](#pass), [phi](#phi), [pi](#pi), [point_dir](#point_dir), [point_dist](#point_dist), [pow](#pow), [print](#print), [prog](#prog), [*q*](#quit), [quit](#quit), [*r*](#reference), [rand](#rand), [rand_int](#rand_int), [rand_seed](#rand_seed), [reference](#reference), [reference_parent](#reference_parent), [repeat](#repeat), [rgb](#rgb), [rickroll](#rickroll), [room](#room), [room_h](#room_h), [room_next](#room_next), [room_w](#room_w), [round](#round), [*rp*](#reference_parent), [run](#run), [runfile](#runfile), [runprog](#runprog), [shader](#shader), [shader_reset](#shader_reset), [sign](#sign), [string](#string), [struct](#struct), [struct_keys](#struct_keys), [sub](#sub), [*subtract*](#sub), [switch](#switch), [*t*](#this), [*test_alias*](#test_operator), [test_constant](#test_constant), [test_operator](#test_operator), [this](#this), [true](#true), [type](#type), [undefined](#undefined), [update](#update), [url_open](#url_open), [*v*](#var), [var](#var), [version](#version), [while](#while)
+[*False*](#false), [*True*](#true), [abs](#abs), [add](#add), [alias](#alias), [and](#and), [angle](#angle), [approach](#approach), [arctan2](#arctan2), [array](#array), [array_get](#array_get), [asset](#asset), [cat](#cat), [ceil](#ceil), [choose](#choose), [clamp](#clamp), [clear](#clear), [color](#color), [color_inv](#color_inv), [color_merge](#color_merge), [color_rand](#color_rand), [console](#console), [cos](#cos), [create](#create), [current](#current), [cursor](#cursor), [date_get](#date_get), [datestring](#datestring), [datetime](#datetime), [dec](#dec), [delta](#delta), [destroy](#destroy), [display_gui_h](#display_gui_h), [display_gui_w](#display_gui_w), [display_h](#display_h), [display_w](#display_w), [div](#div), [*divide*](#div), [do](#do), [dot](#dot), [dot3](#dot3), [dot3_norm](#dot3_norm), [dot_norm](#dot_norm), [draw_alpha](#draw_alpha), [draw_circle](#draw_circle), [draw_color](#draw_color), [draw_ellipse](#draw_ellipse), [draw_font](#draw_font), [draw_format](#draw_format), [draw_halign](#draw_halign), [draw_line](#draw_line), [draw_point](#draw_point), [draw_rect](#draw_rect), [draw_sprite](#draw_sprite), [draw_sprite_general](#draw_sprite_general), [draw_text](#draw_text), [draw_valign](#draw_valign), [e](#e), [eq](#eq), [example](#example), [exec](#exec), [exp](#exp), [export](#export), [false](#false), [floor](#floor), [fps](#fps), [fps_real](#fps_real), [frac](#frac), [fullscreen](#fullscreen), [*g*](#global), [game_speed](#game_speed), [game_time](#game_time), [geq](#geq), [global](#global), [gm_version](#gm_version), [gt](#gt), [help](#help), [hsv](#hsv), [*i*](#inst), [if](#if), [import](#import), [in](#in), [inc](#inc), [inst](#inst), [*l*](#list), [last](#last), [len](#len), [lendir_x](#lendir_x), [lendir_y](#lendir_y), [leq](#leq), [lerp](#lerp), [list](#list), [log](#log), [lt](#lt), [manual](#manual), [map_range](#map_range), [max](#max), [min](#min), [mod](#mod), [mult](#mult), [*multiply*](#mult), [near](#near), [near_cursor](#near_cursor), [neq](#neq), [noone](#noone), [not](#not), [nth](#nth), [*o*](#object), [object](#object), [op_count](#op_count), [op_list](#op_list), [op_names](#op_names), [or](#or), [out](#out), [*p*](#parent), [parent](#parent), [pass](#pass), [phi](#phi), [pi](#pi), [point_dir](#point_dir), [point_dist](#point_dist), [pow](#pow), [print](#print), [prog](#prog), [*q*](#quit), [quit](#quit), [*r*](#reference), [rand](#rand), [rand_int](#rand_int), [rand_seed](#rand_seed), [reference](#reference), [reference_parent](#reference_parent), [repeat](#repeat), [rgb](#rgb), [rickroll](#rickroll), [room](#room), [room_h](#room_h), [room_next](#room_next), [room_w](#room_w), [round](#round), [*rp*](#reference_parent), [run](#run), [runfile](#runfile), [runprog](#runprog), [shader](#shader), [shader_reset](#shader_reset), [sign](#sign), [sin](#sin), [string](#string), [struct](#struct), [struct_keys](#struct_keys), [sub](#sub), [*subtract*](#sub), [switch](#switch), [*t*](#this), [tan](#tan), [*test_alias*](#test_operator), [test_constant](#test_constant), [test_operator](#test_operator), [this](#this), [true](#true), [type](#type), [undefined](#undefined), [update](#update), [url_open](#url_open), [*v*](#var), [var](#var), [version](#version), [while](#while)
 
 ## Operator Documentation
 
@@ -45,6 +45,14 @@ Logical and operator
     - args: [A, B]
     - output: A and B
 
+### angle
+Find the shortest distance between two angles.
+- args: [end_angle, start_angle]
+- output: angle_difference
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "number","int32","int64" ] (required)
+
 ### approach
 Increment a number by some amount while staying within a range
 - args: [number, increment, min, max]
@@ -52,6 +60,14 @@ Increment a number by some amount while staying within a range
 - constraints:
     - count(args) eq 4
     - typeof(args[all]) in [ "number","int32","int64" ] (required)
+
+### arctan2
+Return arctan2 of an angle y/x. y = opposite side of triangle and x = adjacent side of triangle
+- args: [y, x]
+- output: arctan2(y, x)
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "number","int32","int64" ] (required)
 
 ### array
 Create, read, or modify a struct. Behavior depends on the number of arguments:
@@ -146,6 +162,15 @@ Return a reference to the RunGML console, creating one if it doesn't exist
     - count(args) leq 2
     - typeof(args[0]) in [ "string" ] (optional)
 
+### cos
+Return the cosine of an angle in raidans.
+- args: [angle]
+- output: cos/dcos/arccos/darccos(angle)
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "bool" ] (optional)
+    - typeof(args[2]) in [ "bool" ] (optional)
+
 ### create
 Create a new object instance
 - args: [x, y, depth/layer_name, object_name]
@@ -157,10 +182,40 @@ Create a new object instance
     - typeof(args[2]) in [ "string","number","int32","int64" ] (required)
     - typeof(args[3]) in [ "string","number","int32","int64" ] (required)
 
+### current
+Return the current time. Argument is a string specifying a date component: second/minute/hour/day/weekday/month/year, or s/m/h/d/w/M/y.  With no arguments, return the current datetime.
+- args: [('s'/'m'/'h'/'d'/'w'/'M'/'y')]
+- output: number
+- constraints:
+    - typeof(args[0]) in [ "string" ] (optional)
+
 ### cursor
 Return the cursor's coordinates
 - args: []
 - output: [mouse_x, mouse_y]
+
+### date_get
+Get the second, minute, hour, day, weekday, month, or year from a datetime value.
+- args: [datetime, 's'/'m'/'h'/'d'/'w'/'M'/'y']
+- output: number
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "string" ] (required)
+
+### datestring
+Create a string from a datetime value, or return the current datetime if no arguments are passed.
+- args: [(datetime)]
+- output: date_string
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (optional)
+
+### datetime
+Create a datetime value
+- args: [year, month, day, hour, minute, second]
+- output: datetime
+- constraints:
+    - count(args) eq 6
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
 
 ### dec
 Decrement a variable by some amount.  If the variable is undefined, set it to that amount.
@@ -217,6 +272,38 @@ Execute a function
 - constraints:
     - typeof(args[0]) in [ "method" ] (required)
     - typeof(args[1]) in [ "array" ] (optional)
+
+### dot
+Find the dot product of two 2d vectors
+- args: [x1, y1, x2, y2]
+- output: dot_product
+- constraints:
+    - count(args) eq 4
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
+
+### dot3
+Find the dot product of two 3d vectors
+- args: [x1, y1, z1, x2, y2, z2]
+- output: dot_product
+- constraints:
+    - count(args) eq 6
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
+
+### dot3_norm
+Find the normalised dot product of two 3d vectors
+- args: [x1, y1, z1, x2, y2, z2]
+- output: dot_product
+- constraints:
+    - count(args) eq 6
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
+
+### dot_norm
+Find the normalised dot product of two 2d vectors
+- args: [x1, y1, x2, y2]
+- output: dot_product
+- constraints:
+    - count(args) eq 4
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
 
 ### draw_alpha
 Get or set the draw alpha.
@@ -424,6 +511,11 @@ Get or set the game speed in terms of fps
 - args: [(game_speed)]
 - output: (game_speed)
 
+### game_time
+Return the time in seconds since the game began
+- args: []
+- output: number
+
 ### geq
 Check whether the first argument is greater than or equal to the second
     - args: [A, B]
@@ -518,11 +610,17 @@ Returns the length of a string, array, or struct.
 Find the x component for a given vector
 - args: [length, direction]
 - output: x_component
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "number","int32","int64" ] (required)
 
 ### lendir_y
 Find the y component for a given vector
 - args: [length, direction]
 - output: y_component
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "number","int32","int64" ] (required)
 
 ### leq
 Check whether the first argument is less than or equal to the second
@@ -719,11 +817,17 @@ Return the value of the mathematical constant e
 Find the direction from one point to another
 - args: [x1, y1, x2, y2]
 - output: distance
+- constraints:
+    - count(args) eq 4
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
 
 ### point_dist
 Find the distance between two points
 - args: [x1, y1, x2, y2]
 - output: distance
+- constraints:
+    - count(args) eq 4
+    - typeof(args[all]) in [ "number","int32","int64" ] (required)
 
 ### pow
 Raise one number to the power of another
@@ -896,6 +1000,15 @@ Returns the sign of a number (1 if positive, -1 if negative)
 - constraints:
     - typeof(args[0]) in [ "number","int32","int64" ] (required)
 
+### sin
+Return the sine of an angle in raidans.
+- args: [angle]
+- output: sin/dsin/arcsin/darcsin(angle)
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "bool" ] (optional)
+    - typeof(args[2]) in [ "bool" ] (optional)
+
 ### string
 Format a string
     - args: [template, (var0), ...]
@@ -934,6 +1047,15 @@ Perform switch/case evaluation
 - constraints:
     - count(args) eq 2
     - typeof(args[1]) in [ "struct" ] (required)
+
+### tan
+Return the tangent of an angle in raidans.
+- args: [angle, (degrees=true), (inverse=false)]
+- output: tan/dtan/arctan/darctan(angle)
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "bool" ] (optional)
+    - typeof(args[2]) in [ "bool" ] (optional)
 
 ### test_constant
  (constant)
