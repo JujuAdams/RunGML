@@ -1,5 +1,6 @@
-#macro RunGML_Version "2025_04_05_00"
+#macro RunGML_Version "2025_04_09_00"
 #macro RunGML_Homepage "https://github.com/sdelaughter/RunGML"
+
 
 function RunGML_Interpreter(_name="RunGML_I") constructor {
 	name = _name;
@@ -266,24 +267,20 @@ Make a backup of that file before updating RunGML
 Then you can restore your custom settings and operators after updating
 */
 
-global.test = function(_a, _b) {
-	return _a/_b
-}
-
 global.RunGML_Ops = {}
 global.RunGML_Aliases = {}
 
 #region Constants
 
 new RunGML_Op("version", RunGML_Version,
-@"Returns the RunGML version number
+@"Return the RunGML version number
 - args: []
 - output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
 new RunGML_Op("gm_version", GM_version,
-@"Returns the game's version number,
+@"Return the game's version number,
 - args: []
 - output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -310,22 +307,22 @@ new RunGML_Op ("noone", noone,
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 	
-new RunGML_Op ("undefined", undefined,
-@"Return the GameMaker constant undefined
-- args: []
-- output: undefined",
-	[new RunGML_Constraint_ArgCount("eq", 0)]
-)
-	
 new RunGML_Op ("pi", pi,
-@"Return the value of the mathematical constant e
+@"Return the mathematical constant pi
 - args: []
 - output: pi",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
+new RunGML_Op ("tau", 2*pi,
+@"Return the mathematical constant tau
+- args: []
+- output: tau (2*pi)",
+	[new RunGML_Constraint_ArgCount("eq", 0)]
+)
+
 new RunGML_Op ("e", exp(1),
-@"Return the value of the mathematical constant e
+@"Returnf the mathematical constant e
 - args: []
 - output: e",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -347,7 +344,7 @@ new RunGML_Op("update",
 		url_open(RunGML_Homepage);
 		return [];
 	},
-@"Returns the RunGML web address
+@"Open the RunGML homepage in the browser
 - args: []
 - output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -357,7 +354,7 @@ new RunGML_Op("op_count",
 	function(_i, _l=[]) {
 		return struct_names_count(_i.ops);
 	},
-@"Returns the number of supported operators
+@"Return the number of supported operators
 - args: []
 - output: number",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -369,7 +366,7 @@ new RunGML_Op("op_list",
 		array_sort(_op_list, true);
 		return _op_list;
 	},
-@"Returns a list of supported operators
+@"Return a list of supported operators
 - args: []
 - output: [string, *]",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -386,7 +383,7 @@ new RunGML_Op("op_names",
 		}
 		return _str;
 	},
-@"Returns a string listing names of supported operators
+@"Return a string listing names of supported operators
 - args: []
 - output: string",
 	[new RunGML_Constraint_ArgCount("eq", 0)]
@@ -429,8 +426,8 @@ Run ["manual"] to generate full documentation for all operators.
 		}	
 	},
 @"Display documentation for RunGML, or for an operator named by the first argument.
-- args: [(string)]
-- output: string", 
+- args: [(op_name)]
+- output: doc_string", 
 	[
 		new RunGML_Constraint_ArgCount("leq", 1),
 		new RunGML_Constraint_ArgType(0, "string", false)
@@ -604,7 +601,7 @@ new RunGML_Op ("alias",
 	
 #region Control Flow
 
-new RunGML_Op ("pass",
+new RunGML_Op("pass",
 	function(_i, _l=[]) {
 		return [];
 	},
@@ -613,16 +610,16 @@ new RunGML_Op ("pass",
 - output: []"
 )
 	
-new RunGML_Op ("run",
+new RunGML_Op("run",
 	function(_i, _l) {
 		return _i.run(_l);
 	},
-@"Run arguments as a program.
+@"Run arguments as a program, with the first argument becoming the new operator.
 - args: [*]
 - output: *"
 )
 	
-new RunGML_Op ("exec",
+new RunGML_Op("exec",
 	function(_i, _l) {
 		return _i.run(json_parse(_l[0]));
 	},
@@ -635,12 +632,26 @@ new RunGML_Op ("exec",
 	]
 )
 
-new RunGML_Op ("do",
+new RunGML_Op("do",
 	function(_i, _l=[]) {
 		if array_length(_l) < 2 _l[1] = [];
 		return method_call(_l[0], _l[1]);
 	},
-@"Execute a function
+@"Execute a function with an optional list of arguments in its original context using method_call().
+- args: [function, ([args])]
+- output: *",
+	[
+		new RunGML_Constraint_ArgType(0, "method"),
+		new RunGML_Constraint_ArgType(1, "array", false)
+	]
+)
+
+new RunGML_Op("do_here",
+	function(_i, _l=[]) {
+		if array_length(_l) < 2 _l[1] = [];
+		return script_execute_ext(_l[0], _l[1]);
+	},
+@"Execute a function with an optional list of arguments in the operator's context using script_execute_ext().  In most cases, use 'do' instead.
 - args: [function, ([args])]
 - output: *",
 	[
@@ -649,7 +660,7 @@ new RunGML_Op ("do",
 	]
 )
 	
-new RunGML_Op ("last",
+new RunGML_Op("last",
 	function(_i, _l) {
 		var _n = array_length(_l);
 		if _n > 0 return _l[_n - 1];
@@ -660,7 +671,7 @@ new RunGML_Op ("last",
 - output: *"
 )
 	
-new RunGML_Op ("out",
+new RunGML_Op("out",
 	function(_i, _l) {
 		return {"out": _l};
 	},
@@ -669,7 +680,7 @@ new RunGML_Op ("out",
 - output: struct"
 )
 	
-new RunGML_Op ("in",
+new RunGML_Op("in",
 	function(_i, _l) {
 		return struct_get(_l[0], "out");
 	},
@@ -679,7 +690,7 @@ new RunGML_Op ("in",
 	[new RunGML_Constraint_ArgType(0, "struct")]
 )
 	
-new RunGML_Op ("import",
+new RunGML_Op("import",
 	function(_i, _l) {
 		if !file_exists(_l[0]) return [];
 		var _file = file_text_open_read(_l[0]);
@@ -697,7 +708,7 @@ new RunGML_Op ("import",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
-new RunGML_Op ("runfile",
+new RunGML_Op("runfile",
 	function(_i, _l) {
 		return _i.run([
 			["run", ["import", _l[0]]]
@@ -709,7 +720,7 @@ new RunGML_Op ("runfile",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
-new RunGML_Op ("runprog",
+new RunGML_Op("runprog",
 	function(_i, _l) {
 		return _i.run([
 			["run", ["import", ["string", "RunGML/programs/{0}.json", _l[0]]]]
@@ -721,7 +732,7 @@ new RunGML_Op ("runprog",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
-new RunGML_Op ("example",
+new RunGML_Op("example",
 	function(_i, _l) {
 		return _i.run(["run", ["import", ["string", "RunGML/programs/examples/{0}.json", _l[0]]]])
 	},
@@ -731,7 +742,7 @@ new RunGML_Op ("example",
 	[new RunGML_Constraint_ArgType(0, "string")]
 )
 	
-new RunGML_Op ("export",
+new RunGML_Op("export",
 	function(_i, _l) {
 		var _file = file_text_open_write(_l[0]);
 		var _pretty = true;
@@ -753,7 +764,7 @@ new RunGML_Op ("export",
 	]
 )
 	
-new RunGML_Op ("list",
+new RunGML_Op("list",
 	function(_i, _l=[]) {
 		return _l;
 	},
@@ -762,7 +773,7 @@ new RunGML_Op ("list",
 - output: []"
 )
 	
-new RunGML_Op ("prog",
+new RunGML_Op("prog",
 	function(_i, _l=[]) {
 		for (var _line=0; _line<array_length(_l); _line++) {
 			_i.run(_l[_line]);
@@ -835,28 +846,17 @@ new RunGML_Op("repeat",
 	function(_i, _l) {
 		// count, func
 		for (var i=0; i<_l[0]; i++) {
-			_i.run(struct_get(_l[1], "do"));
+			_i.run(RunGML_clone(struct_get(_l[1], "do")));
 		}
 	},
 @"Repeat a function a fixed number of times
-- args: [count, program]
+- args: [count, {'do': program}]
 - output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "numeric"),
-		new RunGML_Constraint_ArgType(1, "list")
+		new RunGML_Constraint_ArgType(1, "struct")
 	]
 )
-
-new RunGML_Op("quit",
-	function(_i, _l) {
-		game_end();
-		return [];
-	}, 
-@"Quit the game
-- args: []
-- output: []"
-)
-
 
 #endregion Control Flow
 	
@@ -871,6 +871,33 @@ new RunGML_Op ("print",
 	},
 @"Print a debug message
     - args: [stringable, (...)]
+    - output: []"
+)
+
+new RunGML_Op ("debug",
+	function(_i, _l) {
+		var _enable = !is_debug_overlay_open();
+		var _minimize = false;
+		var _scale = 1.0
+		var _alpha = 0.8
+		var _n_args = array_length(_l);
+		if _n_args > 0 {
+			_enable = _l[0]
+			if _n_args > 1 {
+				_enable = _l[1]
+				if _n_args > 2 {
+					_enable = _l[2]
+					if _n_args > 3 {
+						_enable = _l[3]
+					}
+				}
+			}
+		}
+		show_debug_overlay(_enable, _minimize, _scale, _alpha);
+		return [];
+	},
+@"Enable or disable the GameMaker deubg overlay. Passing zero arguments toggles its visibility.
+    - args: [(enable), (minimize), (scale), (alpha)]
     - output: []"
 )
 
@@ -1165,6 +1192,47 @@ new RunGML_Op("len",
 - output: length"
 )
 
+new RunGML_Op("asset",
+	function(_i, _l) {
+		return asset_get_index(_l[0])
+	},
+@"Return the index of the named asset
+- args: [asset_name]
+- output: index",
+	[new RunGML_Constraint_ArgType(0, "string")]
+)
+
+new RunGML_Op("type",
+	function(_i, _l) {
+		return typeof(_l[0])
+	},
+@"Return the type of a variable
+- args: [*]
+- output: type_name",
+	[new RunGML_Constraint_ArgCount("eq", 1)]
+)
+
+new RunGML_Op("asset_type",
+	function(_i, _l) {
+		return asset_get_type(_l[0])
+	},
+@"Return the type of a variable
+- args: [*]
+- output: type_name",
+	[new RunGML_Constraint_ArgType(0, ["ref", "string"])]
+)
+	
+new RunGML_Op ("undefined",
+	function(_i, _l) {
+		if array_length(_l) > 0 return is_undefined(_l[0]);
+		else return undefined;
+	},
+@"Return the GameMaker constant undefined, or determines whether the optional argument is undefined.
+- args: [(variable)]
+- output: undefined or True/False",
+	[new RunGML_Constraint_ArgCount("leq", 1)]
+)
+
 #endregion Accessors
 
 #region Math
@@ -1185,7 +1253,8 @@ new RunGML_Op("add",
 
 new RunGML_Op("inc",
 	function(_i, _l) {
-		// a, b
+		if array_length(_l) < 2 _l[1] = 1
+		
 		if struct_exists(_i.registers, _l[0]) {
 			struct_set(_i.registers, _l[0], struct_get(_i.registers, _l[0]) + _l[1])
 		} else {
@@ -1197,15 +1266,14 @@ new RunGML_Op("inc",
 - args: [register_name, number]
 - output: []",
 	[
-		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType(0, "alphanumeric"),
-		new RunGML_Constraint_ArgType(1, "numeric")
+		new RunGML_Constraint_ArgType(1, "numeric", false)
 	]
 )
 
 new RunGML_Op("dec",
 	function(_i, _l) {
-		// a, b
+		if array_length(_l) < 2 _l[1] = 1
 		if struct_exists(_i.registers, _l[0]) {
 			struct_set(_i.registers, _l[0], struct_get(_i.registers, _l[0]) - _l[1])
 		} else {
@@ -1217,9 +1285,8 @@ new RunGML_Op("dec",
 - args: [register_name, number]
 - output: []",
 	[
-		new RunGML_Constraint_ArgCount("eq", 2),
 		new RunGML_Constraint_ArgType(0, "alphanumeric"),
-		new RunGML_Constraint_ArgType(1, "numeric")
+		new RunGML_Constraint_ArgType(1, "numeric", false)
 	]
 )
 	
@@ -2023,6 +2090,19 @@ new RunGML_Op("fullscreen",
 	
 #region Drawing
 
+new RunGML_Op("draw_self",
+	function(_i, _l) {
+		with(_l[0]) draw_self();
+	},
+@"Draw text
+- args: [instance]
+- output: []",
+	[
+		new RunGML_Constraint_ArgType(0, "ref"),
+	]
+)
+
+
 new RunGML_Op("draw_text",
 	function(_i, _l) {
 		// x, y, string
@@ -2037,6 +2117,38 @@ new RunGML_Op("draw_text",
 		new RunGML_Constraint_ArgType(1, "numeric"),
 		new RunGML_Constraint_ArgType(2, "string")
 	]
+)
+
+new RunGML_Op("sprite",
+	function(_i, _l) {
+		var _fname = _l[0]
+		if !file_exists(_fname) return undefined;
+		var _img_number = 1;
+		var _remove_back = false;
+		var _smoothing = false;
+		var _x_origin = 0;
+		var _y_origin = 0;
+		var _n_args = array_length(_l);
+		if _n_args > 1 {
+			_img_number = _l[1]
+			if _n_args > 2 {
+				_remove_back = _l[2]
+				if _n_args > 3 {
+					_smoothing = _l[3]
+					if _n_args > 4 {
+						_x_origin = _l[4]
+						if _n_args > 5 {
+							_y_origin = _l[5]
+						}
+					}
+				}
+			}
+		}
+		return sprite_add(_fname, _img_number, _remove_back, _smoothing, _x_origin, _y_origin);
+	},
+@"Create a new sprite from a file
+- args: [sprite_index, frame, x, y]
+- output: []"
 )
 
 new RunGML_Op("draw_sprite",
@@ -2396,7 +2508,7 @@ new RunGML_Op("color_merge",
 
 new RunGML_Op("color_rand",
 	function(_i, _l) {
-		return random_range(0, 16777216);
+		return irandom_range(0, 16777216);
 	},
 @"Create a random color
 - args: []
@@ -2411,8 +2523,21 @@ new RunGML_Op("color_inv",
 		var _b = color_get_blue(_l[0]);
 		return make_color_rgb(255-_r, 255-_g, 255-_b);
 	},
-@"Create a random color
-- args: []
+@"Return the RGB inverse of a color
+- args: [color]
+- output: color",
+)
+
+new RunGML_Op("color_inv_hue",
+	function(_i, _l) {
+		//return 16777216 - _l[0];
+		var _h = color_get_hue(_l[0]);
+		var _s = color_get_saturation(_l[0]);
+		var _v = color_get_value(_l[0]);
+		return make_color_hsv(255-_h, _s, _v);
+	},
+@"Return the hue inverse of a color, with the same saturation and value
+- args: [color]
 - output: color",
 )
 	
@@ -2677,12 +2802,13 @@ new RunGML_Op("near",
 		var _x = mouse_x;
 		var _y = mouse_y;
 		var _obj = all;
-		if array_length(_l) > 0 {
+		var _n_args = array_length(_l);
+		if _n_args > 0 {
 			_x = _l[0];
-		} if array_length(_l) > 1 {
+		} if _n_args > 1 {
 			_y = _l[1];
 		}
-		if array_length(_l) > 2 {
+		if _n_args > 2 {
 			if typeof(_l[2]) == "string" _obj = asset_get_index(_l[0])
 			else _obj = _l[2];
 		}
@@ -2700,27 +2826,29 @@ new RunGML_Op("near",
 
 #endregion Cursor
 
+#region Game
+new RunGML_Op("restart",
+	function(_i, _l) {
+		game_restart();
+		return [];
+	}, 
+@"Restart the game
+- args: []
+- output: []"
+)
+
+new RunGML_Op("quit",
+	function(_i, _l) {
+		game_end();
+		return [];
+	}, 
+@"Quit the game
+- args: []
+- output: []"
+)
+#endregion Game
+
 #region Misc
-
-new RunGML_Op("asset",
-	function(_i, _l) {
-		return asset_get_index(_l[0])
-	},
-@"Return the index of the named asset
-- args: [asset_name]
-- output: index",
-	[new RunGML_Constraint_ArgType(0, "string")]
-)
-
-new RunGML_Op("type",
-	function(_i, _l) {
-		return typeof(_l[0])
-	},
-@"Return the type of a variable
-- args: [*]
-- output: type_name",
-	[new RunGML_Constraint_ArgCount("eq", 1)]
-)
 
 new RunGML_Op("rickroll",
 	function(_i, _l) {
@@ -2736,6 +2864,7 @@ new RunGML_Op ("test_constant", 23);
 #endregion Misc
 
 #region Aliases
+RunGML_alias("a", "array");
 // "e" is reserved for the mathematical constant
 RunGML_alias("g", "global");
 RunGML_alias("i", "inst");
@@ -2744,10 +2873,12 @@ RunGML_alias("o", "object");
 RunGML_alias("p", "parent");
 RunGML_alias("q", "quit");
 RunGML_alias("r", "reference");
+RunGML_alias("s", "struct");
 RunGML_alias("rp", "reference_parent");
 RunGML_alias("t", "this");
 RunGML_alias("v", "var");
 
+RunGML_alias("str", "string");
 RunGML_alias("multiply", "mult");
 RunGML_alias("subtract", "sub");
 RunGML_alias("divide", "div");

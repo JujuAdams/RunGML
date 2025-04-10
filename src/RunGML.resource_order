@@ -12,6 +12,5 @@
     {"name":"oRunGML_SpriteBuilder","order":4,"path":"objects/oRunGML_SpriteBuilder/oRunGML_SpriteBuilder.yy",},
     {"name":"scrRunGML_Colors","order":2,"path":"scripts/scrRunGML_Colors/scrRunGML_Colors.yy",},
     {"name":"scrRunGML_Config","order":1,"path":"scripts/scrRunGML_Config/scrRunGML_Config.yy",},
-    {"name":"sprRunGML_Font_Pixel","order":1,"path":"sprites/sprRunGML_Font_Pixel/sprRunGML_Font_Pixel.yy",},
   ],
 }

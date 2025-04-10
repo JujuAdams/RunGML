@@ -17,6 +17,7 @@
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/RunGML/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
   "IncludedFiles":[
+    {"$GMIncludedFile":"","%Name":"bounce_spr.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"bounce_spr.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"bounce.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"bounce.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"clock.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"clock.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"counter.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"counter.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
@@ -24,6 +25,7 @@
     {"$GMIncludedFile":"","%Name":"math.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"math.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"object_template.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"object_template.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"object.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"object.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"RunGML.png","CopyToMask":-1,"filePath":"datafiles/RunGML/sprites","name":"RunGML.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
@@ -42,7 +44,6 @@
     {"id":{"name":"scrRunGML_Colors","path":"scripts/scrRunGML_Colors/scrRunGML_Colors.yy",},},
     {"id":{"name":"scrRunGML_Config","path":"scripts/scrRunGML_Config/scrRunGML_Config.yy",},},
     {"id":{"name":"scrRunGML","path":"scripts/scrRunGML/scrRunGML.yy",},},
-    {"id":{"name":"sprRunGML_Font_Pixel","path":"sprites/sprRunGML_Font_Pixel/sprRunGML_Font_Pixel.yy",},},
   ],
   "resourceType":"GMProject",
   "resourceVersion":"2.0",

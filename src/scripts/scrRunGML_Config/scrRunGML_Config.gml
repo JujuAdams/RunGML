@@ -18,7 +18,6 @@ global.RunGML_Console_floatPrecision = 8;
 
 // Set the console's font
 global.RunGML_Console_font = fntRunGML_Console;
-//global.RunGML_Console_font = font_add_sprite(sprRunGML_Font_Pixel, ord("!"), false, 2);
 
 // Set the console's draw scale
 global.RunGML_Console_scale = 1.0;

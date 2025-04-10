@@ -6,14 +6,10 @@ with(RunGMLI) {
 	//run(["print", ["help"]]);
 	
 	// Run a single-line program
-	run(["print", "Hello, world!"]);
+	show_debug_message("RunGML Test: Hello, RunGML?")
+	run(["print", "Hello, RunGML!"]);
 
-	// Run a multi-line program
-	run(["pass",
-		["print", "Hello, multiverse!"],
-		["print", "Hello, other multiverse!"]
-	]);
-	
+	show_debug_message("RunGML Test: Hello, multiple outputs?")
 	// Obtain output of each line in a multi-line program
 	show_debug_message(run(["list",
 		"Hello, multiple outputs!",
@@ -21,40 +17,24 @@ with(RunGMLI) {
 		["string", "{0}{1} output", 3, ["nth", 3]]
 	]))
 	
-	// Obtain output from the last line in a multi-line program
-	show_debug_message(run(["last",
-		["v", 0, "Hello, "],
-		["v", 1, "concatenation!"],
-		["r", "cat", 0, 1]
-	]))
-	
-	//run(["pass",
-	//	["v", 0, 1],
-	//	["v", 1, 42],
-	//	["while", {
-	//		"check": ["r", "lt", 0, 1],
-	//		"do": ["pass",
-	//			["v", 0, ["add", 5, ["v", 0]]],
-	//			["r", "print", 0]
-	//		]
-	//	}]
-	//])
 	
 	// Run a program from a file
-	run(["runfile", "RunGML/programs/examples/hello.txt"]);
+	show_debug_message("RunGML Test: Hello, filesystem?")
+	run(["runfile", "RunGML/programs/examples/hello.json"]);
 
 	// Create an object from a file
-	run(["runfile", "RunGML/programs/examples/object.txt"])
+	show_debug_message("RunGML Test: Hello, file object?")
+	run(["runfile", "RunGML/programs/examples/object.json"])
 
 	// Run an example program
+	show_debug_message("RunGML Test: Hello, math? (2 +/-/*// 3)")
 	run(["example", "math"]);
-
-	//// Display a frame counter
-	//run(["runfile", "RunGML/examples/counter.txt"]);
 	
 	// Create a clock
+	show_debug_message("RunGML Test: Running clock example")
 	run(["example", "clock"]);
 	
 	// Create a bouncer
-	run(["example", "bounce"]);
+	show_debug_message("RunGML Test: Running bounce_spr example")
+	run(["example", "bounce_spr"]);
 }
