@@ -112,9 +112,9 @@ In a sense every RunGML program is a single-line since it must be contained in a
 
 Common approaches are to start with the `"pass"`, `"last"`, or `"list"` operators.
 
-`"pass"` evaluates all of its arguments and returns `[]`
+`"pass"` evaluates all of its arguments and returns an empty list
 
-`"last"` evaluates all of its arguments are returns the last one's value
+`"last"` evaluates all of its arguments and returns the last one's value
 
 `"list"` evaluates all of its arguments and returns a list of their values
 
