@@ -35,6 +35,6 @@ with(RunGMLI) {
 	run(["example", "clock"]);
 	
 	// Create a bouncer
-	show_debug_message("RunGML Test: Running bounce_spr example")
-	run(["example", "bounce_spr"]);
+	show_debug_message("RunGML Test: Running bounce example")
+	run(["example", "bounce"]);
 }

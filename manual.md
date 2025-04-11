@@ -2,7 +2,7 @@
 
 ## About
 
-Version: 2025_04_09_00
+Version: 2025.04.11.0
 
 Homepage: https://github.com/sdelaughter/RunGML
 
