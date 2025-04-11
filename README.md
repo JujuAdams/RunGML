@@ -217,6 +217,16 @@ This library includes two template objects, `oRunGML_Object` and `oRunGML_Object
 - `oRunGML_Object` provides only barebones functionality and is not directly useful.
 - `oRunGML_ObjectTemplate` inherits from `oRunGML_Object` and sets up most events to execute RunGML programs passed through the event dictionary of the `"object"` operator.
 
+You can create a new instance of `oRunGML_ObjectTemplate` with the "object" operator, which accepts the following arguments:
+- x position
+- y position
+- layer name or depth (string or int)
+- dictionary of {"event_name": [RunGML_program]}
+
+Supported event names are: create, step_begin, step, step_end, pre_draw, draw_begin, draw, draw_end, post_draw, draw_gui_begin, draw_gui, draw_gui_end, destroy, clean_up, window_resize, game_start, game_end, room_start, room_end
+
+The clock and bounce example programs showcase basic object creation.
+
 ## Operator Definitions
 
 See the [manual](manual.md) for full documentation of supported operators and aliases.
