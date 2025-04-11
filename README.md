@@ -161,16 +161,6 @@ For example, the following programs are equivalent (they will all return the val
 ]
 ```
 
-
-```
-["pass",
-  ["v", "foo", 2],
-  ["v", "bar", 3],
-  ["v", "sum", ["r", "add", "foo", "bar"]],
-  ["print", "string", "{0}+{1}={2}", [["r", 0], ["r", 1], ["r", 2]]
-]
-```
-
 ## Console
 
 The console object (`oRunGML_Console`) provides a convenient way to debug and modify your game at runtime.
