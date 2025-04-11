@@ -257,8 +257,42 @@ Description of what the operator does.
 "
 ```
 
-The list of constraints is optional.  If present, it should contain `RunGML_Constraint`, `RunGML_Constraint_ArgCount`, and/or `RunGML_Constraint_ArgType` structs.
+### Constraint Definitions
+The list of constraints is optional.  If present, it should contain `RunGML_Constraint_ArgCount`, and/or `RunGML_Constraint_ArgType` structs.  These can be used to enforce constraints on the number and type of arguments, respectively, that the operator will accept.  If violated, a `RunGML_Error` will be printed.
 
+#### RunGML_Constraint_ArgCount
+
+Accpets two arguments:
+1. _op: a string naming a comparison operator
+2. _count: a number to compare against
+    
+Supported comparison operators and their functions are as follows:
+- **"eq"**: arg_count == _count ?
+- **"neq"**: arg_count != _count ?
+- **"lt"**: arg_count < _count ?
+- **"gt"**: arg_count > _count ?
+- **"leq"**: arg_count <= _count ?
+- **"geq"**: arg_count >= _count ?
+- **"in"**: array_contains(_count) ?
+
+Note that the "in" operator expects a list instead of integers instead of a single value.
+
+
+#### RunGML_Constraint_ArgType
+
+Accepts two required parameters:
+1. An argument number (zero-indexed) or the string "all"
+2. A string naming a type or list of types
+
+And two optional parameters:
+3. Whether the argument with the specified number is required. Defaults to False
+4. Whether "bool" type requirements are strict.  Defaults to False, in which case arguments can be allowed as long as they can be cast to a bool.
+
+In addition to the type names provided by GameMaker's `typeof()`, it also supports:
+- "numeric" = ["number", "int32", "int64"]
+- "alphanumeric" = ["string", "number", "int32", "int64"]
+
+## Alias Definitons
 Custom aliases can be added from anywhere using RunGML_alias("nickname", "operator_name").  They also *should* be defined in RunGML_ConfigOps().
 
 Any constraints and aliases will be appended to the docstring automatically when viewing with `"help"` or `"manual"`.
