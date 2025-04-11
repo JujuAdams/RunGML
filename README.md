@@ -45,7 +45,7 @@ You can also execute programs that are stored in JSON files:
 
 Programs stored in `[included files directory]/RunGML/programs/` can be quickly run by name (excluding the `.json` extension, it will be added automatically):
 
-`RunGMLI.runfile(["filename"])`
+`RunGMLI.runprog(["program_name"])`
 
 You can also write and run code from within your game using the [console](#console).
 
