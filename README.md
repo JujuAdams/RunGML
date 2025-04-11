@@ -20,6 +20,15 @@ In addition to the RunGML language definition and interpreter, this library also
     - See [bounce_annotated.md](bounce_annotated.md) for a line-by-line explanation of the [bounce](src/datafiles/RunGML/programs/examples/bounce.json) example program.
 - Thorough documentation that can be accessed using `"help"` or `"manual`.  The latter generates markdown-formatted documentation for all operators, a copy of which is included here as [manual.md](manual.md).
 
+## Installation
+
+1. Download [RunGML.yymps](RunGML.yymps)
+2. In GameMaker Studio, open the `Tools` menu and select `Import Local Package`.
+3. Select the RunGML.ymmps file you just downloaded
+4. Click `Add All`
+5. Click `Import`
+6. (Optional) Add an instance of the `oRunGML_Console` object to the first room of your program.
+
 ## Running Programs
 
 First create an instance of the RunGML interpreter:
