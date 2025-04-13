@@ -16,7 +16,8 @@ var _draw_line_text = wrap_string(line_text, _gui_width);
 var _draw_history_lines = string_split(history_text, "\n");
 
 var _draw_history_text = ""
-for (var i=0; i<array_length(_draw_history_lines); i++) {
+var _n_history_lines = array_length(_draw_history_lines)
+for (var i=0; i<_n_history_lines; i++) {
 	if i > 0 _draw_history_text += "\n";
 	_draw_history_text += wrap_string(_draw_history_lines[i], _gui_width);
 }

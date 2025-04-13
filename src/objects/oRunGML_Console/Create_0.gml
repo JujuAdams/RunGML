@@ -10,7 +10,7 @@ RunGMLI.throw_errors = true;
 
 last_created = noone;
 
-toggle_key = global.RunGML_Console_toggleKey;
+toggle_key = RunGML_Console_toggleKey;
 meta_key = vk_control;
 float_precision = global.RunGML_Console_floatPrecision;
 
@@ -27,7 +27,7 @@ max_history = 20;
 command_history = [];
 command_history_pos = -1;
 command_history_max = 100;
-pause_game = global.RunGML_Console_doPause;
+pause_game = RunGML_Console_doPause;
 
 key_hold_delay = 0.5;
 key_hold_rate = 0.1;
@@ -97,7 +97,8 @@ log_line = function(_l) {
 
 log_string = function(_s) {
 	var lines = string_split(_s, ord("\n"));
-	for (var i=0; i<array_length(lines); i++) {
+	var _n_lines = array_length(lines);
+	for (var i=0; i<_n_lines; i++) {
 		log_line(lines[i]);
 	}
 }
@@ -133,10 +134,10 @@ exec_line = function(_l) {
 	}
 	var _output = RunGMLI.run(_json)
 	if _output == undefined return;
-	if typeof(_output) == "array" {
+	if is_array(_output) {
 		if array_length(_output) < 1 return;
 	}
-	if typeof(_output) == "number" {
+	if is_numeric(_output) {
 		_output = trim_numeric_string(_output);
 	}
 	

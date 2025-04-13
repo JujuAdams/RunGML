@@ -5,8 +5,7 @@
 		["p", "y", ["div", ["display_gui_h"], 2.0]],
 		["if",
 			["undefined", ["g", "RunGML_logoSprite"]], {
-				"true": ["g", "RunGML_logoSprite", ["sprite", "RunGML/sprites/RunGML.png"]],
-				"false": ["print", "Reusing sprite"]
+				"true": ["g", "RunGML_logoSprite", ["sprite", "RunGML/sprites/RunGML.png"]]
 			}
 		],
 		["p", "image_speed", 0],
