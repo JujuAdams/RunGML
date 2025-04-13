@@ -1,6 +1,8 @@
 # RunGML Patch Notes
 
 ## 1.0.2 (2025-04-13)
+- Added a function to auto-generate operators for native GameMaker functions
+    - Simply run: `RunGML_opWrapper("some_GameMaker_function_name")`
 - Added a new operator: `"iter"`
     - Returns the value of the current loop iterator
 - Added a new operator: `"iters"`
