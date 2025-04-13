@@ -1,4 +1,4 @@
-#macro RunGML_Version "2025.04.11.0"
+#macro RunGML_Version "1.0.2"
 #macro RunGML_Homepage "https://github.com/sdelaughter/RunGML"
 
 
@@ -10,6 +10,8 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 	throw_errors = global.RunGML_throwErrors;
 	registers = {};
 	recursion = 0;
+	loop_depth = -1;
+	loop_iter = [];
 	
 	run = function(_l) {
 		if array_length(_l) < 1 return;
@@ -231,6 +233,17 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	}
 
 	struct_set(global.RunGML_Ops, name, self);
+}
+
+function RunGML_opWrapper(_op_name) {
+	if struct_exists(global.RunGML_Ops, _op_name) return new RunGML_Error(string("Cannot redefine existing operator name: {0}", _op_name))
+	new RunGML_Op(_op_name,
+		function(_i, _l) {
+			var _index = asset_get_index(name);
+			if !is_undefined(_index) script_execute_ext(_index, _l);
+		},
+		string("Auto-generated wrapper for GameMaker function: {0}", _op_name)
+	)
 }
 
 function RunGML_alias(_nickname, _name, _i = noone) {
@@ -627,7 +640,7 @@ new RunGML_Op("pass",
 	
 new RunGML_Op("run",
 	function(_i, _l) {
-		var _new_i = new RunGML_Interpreter()
+		var _new_i = new RunGML_Interpreter();
 		if array_length(_l) == 1 {
 			if is_struct(_l[0]) {
 				if struct_exists(_l[0], "do") {
@@ -681,6 +694,18 @@ new RunGML_Op("do_here",
 	[
 		new RunGML_Constraint_ArgType(0, "method"),
 		new RunGML_Constraint_ArgType(1, "array", false)
+	]
+)
+
+new RunGML_Op("op",
+	function(_i, _l=[]) {
+		return RunGML_opWrapper(_l[0]);
+	},
+@"Define a new operator to wrap a built-in gamemaker function.
+- args: ['function_name']
+- output: []",
+	[
+		new RunGML_Constraint_ArgType(0, "string")
 	]
 )
 	
@@ -851,35 +876,48 @@ new RunGML_Op("switch",
 new RunGML_Op("for",
 	function(_i, _l) {
 		//var _i=_l[0];
+		if !struct_exists(_l[4], "do") return [];
+		
 		var _comparison = _l[1];
 		var _reference = _l[2];
 		var _increment = _l[3];
-		if !struct_exists(_l[4], "do") return [];
 		var _program = struct_get(_l[4], "do");
 		
+		var _compare_func;
 		switch _comparison {
 			case "eq":
-				for (var i=_l[0]; i==_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				_compare_func = function(_val, _ref) {return _val == _ref}
 				break;
 			case "neq":
-				for (var i=_l[0]; i!=_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				_compare_func = function(_val, _ref) {return _val != _ref}
 				break;
 			case "lt":
-				for (var i=_l[0]; i<_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				_compare_func = function(_val, _ref) {return _val < _ref}
 				break;
 			case "gt":
-				for (var i=_l[0]; i>_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				_compare_func = function(_val, _ref) {return _val > _ref}
 				break;
 			case "leq":
-				for (var i=_l[0]; i<=_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				_compare_func = function(_val, _ref) {return _val <= _ref}
 				break;
 			case "geq":
-				for (var i=_l[0]; i>=_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				_compare_func = function(_val, _ref) {return _val >= _ref}
 				break;
 			default:
+				_compare_func = function(_val, _ref) {return false};
 				break;
 		}
+		
+		_i.loop_depth += 1;
 
+		for (var i=_l[0]; _compare_func(i, _reference); i+=_increment){
+			_i.loop_iter[_i.loop_depth] = i;
+			_i.run(RunGML_clone(_program))
+			
+		}
+		
+		array_delete(_i.loop_iter, _i.loop_depth, 1)
+		_i.loop_depth -= 1;
 		return [];
 	},
 @"Exectue a RunGML program in a for loop.  Comparison should be one of the following strings: 'eq', 'neq', 'gt', 'lt', 'geq', 'leq'
@@ -898,13 +936,21 @@ new RunGML_Op("for",
 	
 new RunGML_Op("while",
 	function(_i, _l) {
+		if !struct_exists(_l[0], "check") or !struct_exists(_l[0], "do") return [];
 		var _check = struct_get(_l[0], "check")
 		var _f = struct_get(_l[0], "do")
+		
+		_i.loop_depth += 1;
+		_i.loop_iter[_i.loop_depth] = 0;
 		while(true) {
 			if _i.run(RunGML_clone(_check)) {
+				_i.loop_iter[_i.loop_depth] = _i.loop_iter[_i.loop_depth] + 1;
 				_i.run(RunGML_clone(_f));
 			} else break;
 		}
+		array_delete(_i.loop_iter, _i.loop_depth, 1)
+		_i.loop_depth -= 1;
+		return [];
 	},
 @"Exectue a RunGML program while a condition is true
 - args: [{'check': program, 'do': program}]
@@ -916,9 +962,14 @@ new RunGML_Op("while",
 
 new RunGML_Op("repeat",
 	function(_i, _l) {
+		_i.loop_depth += 1;
 		for (var i=0; i<_l[0]; i++) {
+			_i.loop_iter[_i.loop_depth] = i;
 			_i.run(RunGML_clone(struct_get(_l[1], "do")));
 		}
+		array_delete(_i.loop_iter, _i.loop_depth, 1)
+		_i.loop_depth -= 1;
+		return [];
 	},
 @"Repeat a RunGML program a fixed number of times
 - args: [count, {'do': program}]
@@ -927,6 +978,27 @@ new RunGML_Op("repeat",
 		new RunGML_Constraint_ArgType(0, "numeric"),
 		new RunGML_Constraint_ArgType(1, "struct")
 	]
+)
+
+new RunGML_Op("iter",
+	function(_i, _l) {
+		if _i.loop_depth >= 0 return _i.loop_iter[_i.loop_depth];
+		else return undefined
+	},
+@"Get the current loop iterator
+- args: []
+- output: []",
+	[new RunGML_Constraint_ArgCount("eq", 0)]
+)
+
+new RunGML_Op("iters",
+	function(_i, _l) {
+		return _i.loop_iter
+	},
+@"Get a list of all loop iterators
+- args: []
+- output: []",
+	[new RunGML_Constraint_ArgCount("eq", 0)]
 )
 
 #endregion Control Flow

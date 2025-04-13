@@ -1,10 +1,6 @@
 // Start an interpreter
-RunGMLI = new RunGML_Interpreter("Test");
-//RunGMLI.debug = true
 
-with(RunGMLI) {
-	//run(["print", ["help"]]);
-	
+with(new RunGML_Interpreter("Test")) {
 	// Run a single-line program
 	show_debug_message("RunGML Test: Hello, RunGML?")
 	run(["print", "Hello, RunGML!"]);
@@ -38,3 +34,8 @@ with(RunGMLI) {
 	show_debug_message("RunGML Test: Running bounce example")
 	run(["example", "bounce"]);
 }
+
+//with(new RunGML_Interpreter("Debug")) {
+//	debug = true;
+//	run(["example", "loop"])
+//}
