@@ -236,11 +236,13 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 }
 
 function RunGML_opWrapper(_op_name) {
+	if struct_exists(global.RunGML_Ops, _op_name) return new RunGML_Error(string("Cannot redefine existing operator name: {0}", _op_name))
 	new RunGML_Op(_op_name,
 		function(_i, _l) {
-			script_execute_ext(asset_get_index(name), _l);
+			var _index = asset_get_index(name);
+			if !is_undefined(_index) script_execute_ext(_index, _l);
 		},
-		string("Auto-generated wrapper for GameMaker fucntion: {0}", _op_name)
+		string("Auto-generated wrapper for GameMaker function: {0}", _op_name)
 	)
 }
 
@@ -692,6 +694,18 @@ new RunGML_Op("do_here",
 	[
 		new RunGML_Constraint_ArgType(0, "method"),
 		new RunGML_Constraint_ArgType(1, "array", false)
+	]
+)
+
+new RunGML_Op("op",
+	function(_i, _l=[]) {
+		return RunGML_opWrapper(_l[0]);
+	},
+@"Define a new operator to wrap a built-in gamemaker function.
+- args: ['function_name']
+- output: []",
+	[
+		new RunGML_Constraint_ArgType(0, "string")
 	]
 )
 	
