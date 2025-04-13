@@ -7,7 +7,7 @@ Version: 2025.04.11.0
 Homepage: https://github.com/sdelaughter/RunGML
 
 ## Operators & *Aliases*
-[*False*](#false), [*True*](#true), [*a*](#array), [abs](#abs), [add](#add), [alias](#alias), [and](#and), [angle](#angle), [approach](#approach), [arctan2](#arctan2), [array](#array), [array_get](#array_get), [asset](#asset), [asset_type](#asset_type), [cat](#cat), [ceil](#ceil), [choose](#choose), [clamp](#clamp), [clear](#clear), [color](#color), [color_inv](#color_inv), [color_inv_hue](#color_inv_hue), [color_merge](#color_merge), [color_rand](#color_rand), [console](#console), [cos](#cos), [create](#create), [current](#current), [cursor](#cursor), [date_get](#date_get), [datestring](#datestring), [datetime](#datetime), [debug](#debug), [dec](#dec), [delta](#delta), [destroy](#destroy), [display_gui_h](#display_gui_h), [display_gui_w](#display_gui_w), [display_h](#display_h), [display_w](#display_w), [div](#div), [*divide*](#div), [do](#do), [do_here](#do_here), [dot](#dot), [dot3](#dot3), [dot3_norm](#dot3_norm), [dot_norm](#dot_norm), [draw_alpha](#draw_alpha), [draw_circle](#draw_circle), [draw_color](#draw_color), [draw_ellipse](#draw_ellipse), [draw_font](#draw_font), [draw_format](#draw_format), [draw_halign](#draw_halign), [draw_line](#draw_line), [draw_point](#draw_point), [draw_rect](#draw_rect), [draw_self](#draw_self), [draw_sprite](#draw_sprite), [draw_sprite_general](#draw_sprite_general), [draw_text](#draw_text), [draw_valign](#draw_valign), [e](#e), [eq](#eq), [example](#example), [exec](#exec), [exp](#exp), [export](#export), [false](#false), [floor](#floor), [fps](#fps), [fps_real](#fps_real), [frac](#frac), [fullscreen](#fullscreen), [*g*](#global), [game_speed](#game_speed), [game_time](#game_time), [geq](#geq), [global](#global), [gm_version](#gm_version), [gt](#gt), [help](#help), [hsv](#hsv), [*i*](#inst), [if](#if), [import](#import), [in](#in), [inc](#inc), [inst](#inst), [*l*](#list), [last](#last), [len](#len), [lendir_x](#lendir_x), [lendir_y](#lendir_y), [leq](#leq), [lerp](#lerp), [list](#list), [log](#log), [lt](#lt), [manual](#manual), [map_range](#map_range), [max](#max), [min](#min), [mod](#mod), [mult](#mult), [*multiply*](#mult), [near](#near), [near_cursor](#near_cursor), [neq](#neq), [noone](#noone), [not](#not), [nth](#nth), [*o*](#object), [object](#object), [op_count](#op_count), [op_list](#op_list), [op_names](#op_names), [or](#or), [out](#out), [*p*](#parent), [parent](#parent), [pass](#pass), [phi](#phi), [pi](#pi), [point_dir](#point_dir), [point_dist](#point_dist), [pow](#pow), [print](#print), [prog](#prog), [*q*](#quit), [quit](#quit), [*r*](#reference), [rand](#rand), [rand_int](#rand_int), [rand_seed](#rand_seed), [reference](#reference), [reference_parent](#reference_parent), [repeat](#repeat), [restart](#restart), [rgb](#rgb), [rickroll](#rickroll), [room](#room), [room_h](#room_h), [room_next](#room_next), [room_w](#room_w), [round](#round), [*rp*](#reference_parent), [run](#run), [runfile](#runfile), [runprog](#runprog), [*s*](#struct), [shader](#shader), [shader_reset](#shader_reset), [sign](#sign), [sin](#sin), [sprite](#sprite), [*str*](#string), [string](#string), [struct](#struct), [struct_keys](#struct_keys), [sub](#sub), [*subtract*](#sub), [switch](#switch), [*t*](#this), [tan](#tan), [tau](#tau), [*test_alias*](#test_operator), [test_constant](#test_constant), [test_operator](#test_operator), [this](#this), [true](#true), [type](#type), [undefined](#undefined), [update](#update), [url_open](#url_open), [*v*](#var), [var](#var), [version](#version), [while](#while)
+[*False*](#false), [*True*](#true), [*a*](#array), [abs](#abs), [add](#add), [alias](#alias), [and](#and), [angle](#angle), [approach](#approach), [arctan2](#arctan2), [array](#array), [array_get](#array_get), [asset](#asset), [asset_type](#asset_type), [cat](#cat), [ceil](#ceil), [choose](#choose), [clamp](#clamp), [clear](#clear), [color](#color), [color_inv](#color_inv), [color_inv_hue](#color_inv_hue), [color_merge](#color_merge), [color_rand](#color_rand), [console](#console), [cos](#cos), [create](#create), [current](#current), [cursor](#cursor), [date_get](#date_get), [datestring](#datestring), [datetime](#datetime), [debug](#debug), [dec](#dec), [delta](#delta), [destroy](#destroy), [display_gui_h](#display_gui_h), [display_gui_w](#display_gui_w), [display_h](#display_h), [display_w](#display_w), [div](#div), [*divide*](#div), [do](#do), [do_here](#do_here), [dot](#dot), [dot3](#dot3), [dot3_norm](#dot3_norm), [dot_norm](#dot_norm), [draw_alpha](#draw_alpha), [draw_circle](#draw_circle), [draw_color](#draw_color), [draw_ellipse](#draw_ellipse), [draw_font](#draw_font), [draw_format](#draw_format), [draw_halign](#draw_halign), [draw_line](#draw_line), [draw_point](#draw_point), [draw_rect](#draw_rect), [draw_self](#draw_self), [draw_sprite](#draw_sprite), [draw_sprite_general](#draw_sprite_general), [draw_text](#draw_text), [draw_valign](#draw_valign), [e](#e), [eq](#eq), [example](#example), [exec](#exec), [exp](#exp), [export](#export), [false](#false), [floor](#floor), [for](#for), [fps](#fps), [fps_real](#fps_real), [frac](#frac), [fullscreen](#fullscreen), [*g*](#global), [game_speed](#game_speed), [game_time](#game_time), [geq](#geq), [global](#global), [gm_version](#gm_version), [gt](#gt), [help](#help), [hsv](#hsv), [*i*](#inst), [if](#if), [import](#import), [in](#in), [inc](#inc), [inst](#inst), [*l*](#list), [last](#last), [len](#len), [lendir_x](#lendir_x), [lendir_y](#lendir_y), [leq](#leq), [lerp](#lerp), [list](#list), [log](#log), [lt](#lt), [manual](#manual), [map_range](#map_range), [max](#max), [min](#min), [mod](#mod), [mult](#mult), [*multiply*](#mult), [near](#near), [near_cursor](#near_cursor), [neq](#neq), [noone](#noone), [not](#not), [nth](#nth), [*o*](#object), [object](#object), [op_count](#op_count), [op_list](#op_list), [op_names](#op_names), [or](#or), [out](#out), [*p*](#parent), [parent](#parent), [pass](#pass), [phi](#phi), [pi](#pi), [point_dir](#point_dir), [point_dist](#point_dist), [pow](#pow), [print](#print), [prog](#prog), [*q*](#quit), [quit](#quit), [*r*](#reference), [rand](#rand), [rand_int](#rand_int), [rand_seed](#rand_seed), [reference](#reference), [reference_parent](#reference_parent), [repeat](#repeat), [restart](#restart), [rgb](#rgb), [rickroll](#rickroll), [room](#room), [room_h](#room_h), [room_next](#room_next), [room_w](#room_w), [round](#round), [*rp*](#reference_parent), [run](#run), [runfile](#runfile), [runprog](#runprog), [*s*](#struct), [shader](#shader), [shader_reset](#shader_reset), [sign](#sign), [sin](#sin), [sprite](#sprite), [*str*](#string), [string](#string), [struct](#struct), [struct_keys](#struct_keys), [sub](#sub), [*subtract*](#sub), [switch](#switch), [*t*](#this), [tan](#tan), [tau](#tau), [*test_alias*](#test_operator), [test_constant](#test_constant), [test_operator](#test_operator), [this](#this), [true](#true), [type](#type), [undefined](#undefined), [update](#update), [url_open](#url_open), [*v*](#var), [var](#var), [version](#version), [while](#while)
 
 ## Operator Documentation
 
@@ -70,7 +70,7 @@ Return arctan2 of an angle y/x. y = opposite side of triangle and x = adjacent s
     - typeof(args[1]) in [ "number","int32","int64" ] (required)
 
 ### array
-Create, read, or modify a struct. Behavior depends on the number of arguments:
+Create, read, or modify an array. Behavior depends on the number of arguments:
 
 0. Return an empty array
 1. Return [arg0]
@@ -516,6 +516,19 @@ Rounds a number down
 - constraints:
     - typeof(args[0]) in [ "number","int32","int64" ] (required)
 
+### for
+Exectue a RunGML program in a for loop.  Comparison should be one of the following strings: 'eq', 'neq', 'gt', 'lt', 'geq', 'leq'
+        for (var i=[start]; i [comparison] [reference]; i += increment) {run(program)}
+		
+- args: [start, comparison, reference, increment, {'do': program}]
+- output: []
+- constraints:
+    - typeof(args[0]) in [ "number","int32","int64" ] (required)
+    - typeof(args[1]) in [ "string" ] (required)
+    - typeof(args[2]) in [ "number","int32","int64" ] (required)
+    - typeof(args[3]) in [ "number","int32","int64" ] (required)
+    - typeof(args[4]) in [ "struct" ] (required)
+
 ### fps
 Get the current fps (capped at the room speed)
 - args: []
@@ -946,7 +959,7 @@ Similar to the 'reference' ('r') operator, but substitutes with values from the 
 - aliases: [ "rp" ]
 
 ### repeat
-Repeat a function a fixed number of times
+Repeat a RunGML program a fixed number of times
 - args: [count, {'do': program}]
 - output: []
 - constraints:
@@ -999,7 +1012,7 @@ Rounds a number
     - typeof(args[0]) in [ "number","int32","int64" ] (required)
 
 ### run
-Run arguments as a program, with the first argument becoming the new operator.
+Run arguments as a program, with the first argument becoming the new operator.  Creates and uses a separate interpreter instance.
 - args: [*]
 - output: *
 
@@ -1180,7 +1193,7 @@ Return the RunGML version number
     - count(args) eq 0
 
 ### while
-Exectue a function while a condition is true
+Exectue a RunGML program while a condition is true
 - args: [{'check': program, 'do': program}]
 - output: []
 - constraints:

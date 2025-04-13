@@ -7,6 +7,7 @@ if frac(age) > 0.5 {
 
 line_text = string(prompt) + string(string_insert(blinking_cursor, current_line, cursor_pos));
 history_text = "";
-for (var i=0; i<array_length(history); i++) {
+var _history_len = array_length(history)
+for (var i=0; i<_history_len; i++) {
 	history_text += string(history[i]) + "\n";
 }
