@@ -19,6 +19,7 @@
   "ForcedPrefabProjectReferences":[],
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"bounce.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"bounce.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"loop.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"loop.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"clock.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"clock.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"counter.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"counter.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"hello.json","CopyToMask":-1,"filePath":"datafiles/RunGML/programs/examples","name":"hello.json","resourceType":"GMIncludedFile","resourceVersion":"2.0",},

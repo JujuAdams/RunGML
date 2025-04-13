@@ -61,6 +61,9 @@ function RunGML_ConfigOps() {
 	// You can also define aliases for operators
 	RunGML_alias("test_alias", "test_operator")
 	
+	// Create wrappers for native GameMaker functions by name
+	RunGML_opWrapper("show_debug_message");
+	
 	// And define new color names for use with the "color" operator
 	RunGML_color("seafoam", #78aa9f)
 }

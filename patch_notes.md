@@ -1,6 +1,13 @@
 # RunGML Patch Notes
 
 ## 1.0.1 (2025-04-13)
+- Added a new operator: `"iter"`
+    - Returns the value of the current loop iterator
+- Added a new operator: `"iters"`
+    - Returns a list of loop iterator values ordered by increasing loop depth
+- Added a new `loop` example program
+
+## 1.0.1 (2025-04-13)
 
 - Switched to semantic versioning (2025.04.11.0 -> 1.0.0)
 - Added a macro to toggle constraint validation: `RunGML_I_checkConstraints`
