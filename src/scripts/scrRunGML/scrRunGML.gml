@@ -640,7 +640,7 @@ new RunGML_Op("pass",
 	
 new RunGML_Op("run",
 	function(_i, _l) {
-		var _new_i = variable_clone(_i);
+		var _new_i = new RunGML_Interpreter();
 		if array_length(_l) == 1 {
 			if is_struct(_l[0]) {
 				if struct_exists(_l[0], "do") {

@@ -33,6 +33,8 @@ with(new RunGML_Interpreter("Test")) {
 	// Create a bouncer
 	show_debug_message("RunGML Test: Running bounce example")
 	run(["example", "bounce"]);
+	
+	run(["example", "loop"])
 }
 
 //with(new RunGML_Interpreter("Debug")) {
