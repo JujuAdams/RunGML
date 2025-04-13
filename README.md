@@ -45,7 +45,7 @@ You can also execute programs that are stored in JSON files:
 
 Programs stored in `[included files directory]/RunGML/programs/` can be quickly run by name (excluding the `.json` extension, it will be added automatically):
 
-`RunGMLI.runfile(["filename"])`
+`RunGMLI.runprog(["program_name"])`
 
 You can also write and run code from within your game using the [console](#console).
 
@@ -112,17 +112,11 @@ In a sense every RunGML program is a single-line since it must be contained in a
 
 Common approaches are to start with the `"pass"`, `"last"`, or `"list"` operators.
 
-`"pass"` evaluates all of its arguments and returns `[]`
-`"last"` evaluates all of its arguments are returns the last one's value
-`"list"` evaluates all of its arguments and 
+`"pass"` evaluates all of its arguments and returns an empty list
 
-Use pass
-```
-["pass",
-  ["print", "Hello, world!"],
-  ["add", 2, 3]  
-]
-```
+`"last"` evaluates all of its arguments and returns the last one's value
+
+`"list"` evaluates all of its arguments and returns a list of their values
 
 ### Variables
 
@@ -164,16 +158,6 @@ For example, the following programs are equivalent (they will all return the val
   ["v", "foo", 2],
   ["v", "bar", 3],
   ["r", "add", "foo", "bar"],
-]
-```
-
-
-```
-["pass",
-  ["v", "foo", 2],
-  ["v", "bar", 3],
-  ["v", "sum", ["r", "add", "foo", "bar"]],
-  ["print", "string", "{0}+{1}={2}", [["r", 0], ["r", 1], ["r", 2]]
 ]
 ```
 
@@ -233,6 +217,16 @@ This library includes two template objects, `oRunGML_Object` and `oRunGML_Object
 - `oRunGML_Object` provides only barebones functionality and is not directly useful.
 - `oRunGML_ObjectTemplate` inherits from `oRunGML_Object` and sets up most events to execute RunGML programs passed through the event dictionary of the `"object"` operator.
 
+You can create a new instance of `oRunGML_ObjectTemplate` with the "object" operator, which accepts the following arguments:
+- x position
+- y position
+- layer name or depth (string or int)
+- dictionary of {"event_name": [RunGML_program]}
+
+Supported event names are: create, step_begin, step, step_end, pre_draw, draw_begin, draw, draw_end, post_draw, draw_gui_begin, draw_gui, draw_gui_end, destroy, clean_up, window_resize, game_start, game_end, room_start, room_end
+
+The clock and bounce example programs showcase basic object creation.
+
 ## Operator Definitions
 
 See the [manual](manual.md) for full documentation of supported operators and aliases.
@@ -263,8 +257,42 @@ Description of what the operator does.
 "
 ```
 
-The list of constraints is optional.  If present, it should contain `RunGML_Constraint`, `RunGML_Constraint_ArgCount`, and/or `RunGML_Constraint_ArgType` structs.
+### Constraint Definitions
+The list of constraints is optional.  If present, it should contain `RunGML_Constraint_ArgCount`, and/or `RunGML_Constraint_ArgType` structs.  These can be used to enforce constraints on the number and type of arguments, respectively, that the operator will accept.  If violated, a `RunGML_Error` will be printed.
 
+#### RunGML_Constraint_ArgCount
+
+Accpets two arguments:
+1. _op: a string naming a comparison operator
+2. _count: a number to compare against
+    
+Supported comparison operators and their functions are as follows:
+- **"eq"**: arg_count == _count ?
+- **"neq"**: arg_count != _count ?
+- **"lt"**: arg_count < _count ?
+- **"gt"**: arg_count > _count ?
+- **"leq"**: arg_count <= _count ?
+- **"geq"**: arg_count >= _count ?
+- **"in"**: array_contains(_count) ?
+
+Note that the "in" operator expects a list instead of integers instead of a single value.
+
+
+#### RunGML_Constraint_ArgType
+
+Accepts two required parameters:
+1. An argument number (zero-indexed) or the string "all"
+2. A string naming a type or list of types
+
+And two optional parameters:
+3. Whether the argument with the specified number is required. Defaults to False
+4. Whether "bool" type requirements are strict.  Defaults to False, in which case arguments can be allowed as long as they can be cast to a bool.
+
+In addition to the type names provided by GameMaker's `typeof()`, it also supports:
+- "numeric" = ["number", "int32", "int64"]
+- "alphanumeric" = ["string", "number", "int32", "int64"]
+
+## Alias Definitons
 Custom aliases can be added from anywhere using RunGML_alias("nickname", "operator_name").  They also *should* be defined in RunGML_ConfigOps().
 
 Any constraints and aliases will be appended to the docstring automatically when viewing with `"help"` or `"manual"`.
