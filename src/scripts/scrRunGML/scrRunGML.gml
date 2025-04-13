@@ -15,8 +15,9 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 		if array_length(_l) < 1 return;
 		recursion += 1
 		if debug show_debug_message(@"RunGML_I:{0}[{1}].run({2})", name, recursion, _l);
-		for (var i=0; i<array_length(_l); i++) {
-			if typeof(_l[i]) == "array" {
+		var _n_args = array_length(_l);
+		for (var i=0; i<_n_args; i++) {
+			if is_array(_l[i]) {
 				_l[i] = run(_l[i]);
 			}
 		}
@@ -112,7 +113,9 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true, _
 	strict_bool = _strict_bool;
 	if types == "numeric" types = ["number", "int32", "int64"];
 	if types == "alphanumeric" types = ["string", "number", "int32", "int64"];
-	if typeof(types) != "array" types = [types];
+	if !is_array(types) {
+		types = [types];
+	}
 	doc = function() {
 		var _docstring = string("typeof(args[{0}]) in {1}", index, types)
 		if required _docstring += " (required)"
@@ -128,7 +131,8 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true, _
 		if types == noone return true;
 		var _val, _type;
 		if index == "all" {
-			for (var i=0; i<array_length(_l); i++) {
+			var _n_args = array_length(_l);
+			for (var i=0; i<_n_args; i++) {
 				_val = _l[i];
 				_type = typeof(_val);
 				if not array_contains(types, _type) {
@@ -149,7 +153,7 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true, _
 				if !strict_bool and array_contains(types, "bool") {
 					try {
 						var _booled = bool(_val);
-						if typeof(_booled) == "bool" {
+						if is_bool(_booled) {
 							_l[index] = _booled;
 							return true;
 						}
@@ -163,7 +167,7 @@ function RunGML_Constraint_ArgType(_index="all", _types=noone, _required=true, _
 }
 
 function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
-	if struct_exists(global.RunGML_Ops, _name) and not global.RunGML_overwriteOps return;
+	if struct_exists(global.RunGML_Ops, _name) and not RunGML_overwriteOps return;
 
 	name = _name;
 	aliases = [];
@@ -173,7 +177,9 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	help = function() {
 		var _docstring = string(@"### {0}", name);
 		_docstring += string("\n{0}", desc);
-		if typeof(f) != "method" _docstring += " (constant)"
+		if !is_method(f) {
+			_docstring += " (constant)"
+		}
 		if array_length(aliases) > 0 {
 			_docstring += string("\n- aliases: {0}", aliases);
 		}
@@ -189,10 +195,15 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	
 	exec = function(_i, _l) {
 		var _out = undefined;
-		var _err = valid(_i, _l);
+		var _err;
+		if RunGML_I_checkConstraints {
+			_err = valid(_i, _l);
+		} else {
+			_err = true;	
+		}
 		if is_instanceof(_err, RunGML_Error) return _err;
 		else {
-			if typeof(f) == "method" {
+			if is_method(f) {
 				try {
 					_out = script_execute(f, _i, _l);
 				} catch(_e) {
@@ -206,7 +217,8 @@ function RunGML_Op(_name, _f, _desc="", _constraints=[]) constructor {
 	
 	valid = function(_i, _l) {
 		var _constraint, _err;
-		for(var i=0; i<array_length(constraints); i++) {
+		var _n_constraints = array_length(constraints);
+		for(var i=0; i<_n_constraints; i++) {
 			_constraint = constraints[i];
 			_err = constraints[i].check(_l)
 			if is_instanceof(_err, RunGML_Error) {
@@ -248,12 +260,12 @@ function RunGML_alias(_nickname, _name, _i = noone) {
 	
 	struct_set(_aliases, _nickname, _name);
 	array_push(struct_get(struct_get(_ops, _name), "aliases"), _nickname);
-	return [];;
+	return [];
 }
 
 function RunGML_clone(_l) {
 // Deep copy a nested list.  Enables program reuse
-	return json_parse(json_stringify(_l));	
+	return variable_clone(_l);
 }
 
 function RunGML_color(_name, _color) {
@@ -377,7 +389,8 @@ new RunGML_Op("op_names",
 		var _op_list = struct_get_names(_i.ops);
 		array_sort(_op_list, true);
 		var _str = "";
-		for (var i=0; i<array_length(_op_list); i++) {
+		var _op_count = array_length(_op_list)
+		for (var i=0; i<_op_count; i++) {
 			if i > 0 _str += ", ";
 			_str += _op_list[i];
 		}
@@ -456,7 +469,8 @@ Homepage: {1}",
 		));
 		file_text_write_string(_f, "\n\n## Operators & *Aliases*\n");
 		var _str = "";
-		for (var i=0; i<array_length(_ops); i++) {
+		var _op_count = array_length(_ops)
+		for (var i=0; i<_op_count; i++) {
 			_op_name = _ops[i];
 			if struct_exists(_i.ops, _op_name) {
 				_op = struct_get(_i.ops, _op_name);
@@ -471,7 +485,8 @@ Homepage: {1}",
 		}
 		
 		file_text_write_string(_f, "\n\n## Operator Documentation\n");
-		for (var i=0; i<array_length(_ops); i++) {
+
+		for (var i=0; i<_op_count; i++) {
 			_op_name = _ops[i];
 			if !struct_exists(_i.ops, _op_name) continue;
 			_op = struct_get(_i.ops, _op_name)
@@ -612,9 +627,18 @@ new RunGML_Op("pass",
 	
 new RunGML_Op("run",
 	function(_i, _l) {
-		return _i.run(_l);
+		var _new_i = new RunGML_Interpreter()
+		if array_length(_l) == 1 {
+			if is_struct(_l[0]) {
+				if struct_exists(_l[0], "do") {
+					_l = struct_get(_l[0], "do");
+				}
+			}
+		}
+		return _new_i.run(RunGML_clone(_l));
+		delete _new_i;
 	},
-@"Run arguments as a program, with the first argument becoming the new operator.
+@"Run arguments as a program, with the first argument becoming the new operator.  Creates and uses a separate interpreter instance.
 - args: [*]
 - output: *"
 )
@@ -775,7 +799,8 @@ new RunGML_Op("list",
 	
 new RunGML_Op("prog",
 	function(_i, _l=[]) {
-		for (var _line=0; _line<array_length(_l); _line++) {
+		var _n_args = array_length(_l);
+		for (var _line=0; _line<_n_args; _line++) {
 			_i.run(_l[_line]);
 		}
 		return [];
@@ -822,10 +847,57 @@ new RunGML_Op("switch",
 		new RunGML_Constraint_ArgType(1, "struct")
 	]
 )
+
+new RunGML_Op("for",
+	function(_i, _l) {
+		//var _i=_l[0];
+		var _comparison = _l[1];
+		var _reference = _l[2];
+		var _increment = _l[3];
+		if !struct_exists(_l[4], "do") return [];
+		var _program = struct_get(_l[4], "do");
+		
+		switch _comparison {
+			case "eq":
+				for (var i=_l[0]; i==_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				break;
+			case "neq":
+				for (var i=_l[0]; i!=_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				break;
+			case "lt":
+				for (var i=_l[0]; i<_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				break;
+			case "gt":
+				for (var i=_l[0]; i>_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				break;
+			case "leq":
+				for (var i=_l[0]; i<=_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				break;
+			case "geq":
+				for (var i=_l[0]; i>=_reference; i+=_increment){(_i.run(RunGML_clone(_program)))}
+				break;
+			default:
+				break;
+		}
+
+		return [];
+	},
+@"Exectue a RunGML program in a for loop.  Comparison should be one of the following strings: 'eq', 'neq', 'gt', 'lt', 'geq', 'leq'
+        for (var i=[start]; i [comparison] [reference]; i += increment) {run(program)}
+		
+- args: [start, comparison, reference, increment, {'do': program}]
+- output: []",
+	[
+		new RunGML_Constraint_ArgType(0, "numeric"),
+		new RunGML_Constraint_ArgType(1, "string"),
+		new RunGML_Constraint_ArgType(2, "numeric"),
+		new RunGML_Constraint_ArgType(3, "numeric"),
+		new RunGML_Constraint_ArgType(4, "struct")
+	]
+)
 	
 new RunGML_Op("while",
 	function(_i, _l) {
-		// condition, func
 		var _check = struct_get(_l[0], "check")
 		var _f = struct_get(_l[0], "do")
 		while(true) {
@@ -834,22 +906,21 @@ new RunGML_Op("while",
 			} else break;
 		}
 	},
-@"Exectue a function while a condition is true
+@"Exectue a RunGML program while a condition is true
 - args: [{'check': program, 'do': program}]
 - output: []",
 	[
 		new RunGML_Constraint_ArgType(0, "struct")
 	]
 )
-	
+
 new RunGML_Op("repeat",
 	function(_i, _l) {
-		// count, func
 		for (var i=0; i<_l[0]; i++) {
 			_i.run(RunGML_clone(struct_get(_l[1], "do")));
 		}
 	},
-@"Repeat a function a fixed number of times
+@"Repeat a RunGML program a fixed number of times
 - args: [count, {'do': program}]
 - output: []",
 	[
@@ -864,7 +935,8 @@ new RunGML_Op("repeat",
 
 new RunGML_Op ("print",
 	function(_i, _l) {
-		for(var i=0; i<array_length(_l); i++) {
+		var _n_args = array_length(_l);
+		for(var i=0; i<_n_args; i++) {
 			show_debug_message(string(_l[i]));
 		}
 		return [];
@@ -919,7 +991,8 @@ new RunGML_Op ("string",
 new RunGML_Op ("cat",
 	function(_i, _l) {
 		var _out = "";
-		for (var i=0; i<array_length(_l); i++) {
+		var _n_args = array_length(_l);
+		for (var i=0; i<_n_args; i++) {
 			_out += string(_l[i]);	
 		}
 		return _out;
@@ -982,7 +1055,8 @@ new RunGML_Op ("reference",
 	function(_i, _l) {
 		if array_length(_l) == 0 return _i.registers;
 		if struct_exists(_i.ops, _l[0]) {
-			for (var i=1; i<array_length(_l); i++) {
+			var _n_args = array_length(_l)
+			for (var i=1; i<_n_args; i++) {
 				if struct_exists(_i.registers, _l[i]) {
 					_l[i] = struct_get(_i.registers, _l[i]);
 				}
@@ -1009,7 +1083,8 @@ new RunGML_Op ("reference_parent",
 	function(_i, _l) {
 		if array_length(_l) == 0 return variable_instance_get_names(_i.parent);
 		if struct_exists(_i.ops, _l[0]) {
-			for (var i=1; i<array_length(_l); i++) {
+			var _n_args = array_length(_l);
+			for (var i=1; i<_n_args; i++) {
 				if variable_instance_exists(_i.parent, _l[i]) {
 					_l[i] = variable_instance_get(_i.parent, _l[i]);
 				}
@@ -1147,7 +1222,7 @@ new RunGML_Op("array",
 				break;
 		}
 	},
-@"Create, read, or modify a struct. Behavior depends on the number of arguments:
+@"Create, read, or modify an array. Behavior depends on the number of arguments:
 
 0. Return an empty array
 1. Return [arg0]
@@ -1714,7 +1789,7 @@ new RunGML_Op("arctan2",
 new RunGML_Op("object",
 	function(_i, _l) {
 		var _inst;
-		if typeof(_l[2]) == "string" {
+		if is_string(_l[2]) {
 			_inst = instance_create_layer(_l[0], _l[1], _l[2], oRunGML_ObjectTemplate);
 		} else {
 			_inst = instance_create_depth(_l[0], _l[1], _l[2], oRunGML_ObjectTemplate);
@@ -1738,10 +1813,10 @@ new RunGML_Op("object",
 new RunGML_Op("create",
 	function(_i, _l) {
 		// x, y, layer, object_index
-		if typeof(_l[3]) == "string" {
+		if is_string(_l[3]) {
 			_l[3] = asset_get_index(_l[3])
 		}
-		if typeof(_l[2]) == "string" {
+		if is_string(_l[2]) {
 			return instance_create_layer(_l[0], _l[1], _l[2], _l[3]);
 		} else {
 			return instance_create_depth(_l[0], _l[1], _l[2], _l[3]);
@@ -2354,7 +2429,7 @@ new RunGML_Op("draw_alpha",
 new RunGML_Op("draw_font",
 	function(_i, _l) {
 		if array_length(_l) < 1 return draw_get_font();
-		if typeof(_l[0]) == "string" {
+		if is_string(_l[0]) {
 			_l[0] = asset_get_index(_l[0]);
 		}
 		draw_set_font(_l[0]);
@@ -2437,7 +2512,7 @@ new RunGML_Op("draw_format",
 		}
 		else {
 			var _font = _l[0][0];
-			if typeof(_font) == "string" {
+			if is_string(_font) {
 				_font = asset_get_index(_font);
 			}
 			return _i.run(["pass",
@@ -2553,7 +2628,9 @@ new RunGML_Op ("shader",
 				return [];
 			case 1:
 				var _sh = _l[1];
-				if typeof(_sh) == "string" _sh = asset_get_index(_sh);
+				if is_string(_sh) {
+					_sh = asset_get_index(_sh);
+				}
 				shader_set(_sh)
 				return []
 		}
@@ -2786,7 +2863,9 @@ new RunGML_Op("near_cursor",
 	function(_i, _l) {
 		var _obj = all;
 		if array_length(_l) > 0 {
-			if typeof(_l[0]) == "string" _obj = asset_get_index(_l[0])
+			if is_string(_l[0]) {
+				_obj = asset_get_index(_l[0]);
+			}
 			else _obj = _l[0];
 		}
 		return instance_nearest(mouse_x, mouse_y, _obj);
@@ -2809,7 +2888,9 @@ new RunGML_Op("near",
 			_y = _l[1];
 		}
 		if _n_args > 2 {
-			if typeof(_l[2]) == "string" _obj = asset_get_index(_l[0])
+			if is_string(_l[2]) {
+				_obj = asset_get_index(_l[0]);
+			}
 			else _obj = _l[2];
 		}
 		return instance_nearest(_x, _y, _obj);
