@@ -1,6 +1,6 @@
 # RunGML Patch Notes
 
-## 1.0.1 (2025-04-13)
+## 1.0.2 (2025-04-13)
 - Added a new operator: `"iter"`
     - Returns the value of the current loop iterator
 - Added a new operator: `"iters"`
