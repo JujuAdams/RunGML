@@ -1,4 +1,4 @@
-#macro RunGML_Version "1.0.2"
+#macro RunGML_Version "1.0.3"
 #macro RunGML_Homepage "https://github.com/sdelaughter/RunGML"
 
 
@@ -9,7 +9,7 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 	debug = global.RunGML_I_debug;
 	throw_errors = global.RunGML_throwErrors;
 	registers = {};
-	recursion = 0;
+	recursion = -1;
 	loop_depth = -1;
 	loop_iter = [];
 	

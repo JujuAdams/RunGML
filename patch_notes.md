@@ -1,5 +1,8 @@
 # RunGML Patch Notes
 
+## 1.0.3 (2025-04-16)
+- Improved efficiency of memory allocation in the interpreter by making list execution non-destructive (Thank you @JujuAdams!)
+
 ## 1.0.2 (2025-04-13)
 - Added a function to auto-generate operators for native GameMaker functions
     - Simply run: `RunGML_opWrapper("some_GameMaker_function_name")`
