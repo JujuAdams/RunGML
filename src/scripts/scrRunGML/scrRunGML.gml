@@ -663,7 +663,7 @@ new RunGML_Op("run",
 				}
 			}
 		}
-		return _new_i.run(RunGML_clone(_l));
+		return _new_i.run(_l);
 		delete _new_i;
 	},
 @"Run arguments as a program, with the first argument becoming the new operator.  Creates and uses a separate interpreter instance.
@@ -927,7 +927,7 @@ new RunGML_Op("for",
 
 		for (var i=_l[0]; _compare_func(i, _reference); i+=_increment){
 			_i.loop_iter[_i.loop_depth] = i;
-			_i.run(RunGML_clone(_program))
+			_i.run(_program)
 			
 		}
 		
@@ -958,9 +958,9 @@ new RunGML_Op("while",
 		_i.loop_depth += 1;
 		_i.loop_iter[_i.loop_depth] = 0;
 		while(true) {
-			if _i.run(RunGML_clone(_check)) {
+			if _i.run(_check) {
 				_i.loop_iter[_i.loop_depth] = _i.loop_iter[_i.loop_depth] + 1;
-				_i.run(RunGML_clone(_f));
+				_i.run(_f);
 			} else break;
 		}
 		array_delete(_i.loop_iter, _i.loop_depth, 1)
@@ -980,7 +980,7 @@ new RunGML_Op("repeat",
 		_i.loop_depth += 1;
 		for (var i=0; i<_l[0]; i++) {
 			_i.loop_iter[_i.loop_depth] = i;
-			_i.run(RunGML_clone(struct_get(_l[1], "do")));
+			_i.run(struct_get(_l[1], "do"));
 		}
 		array_delete(_i.loop_iter, _i.loop_depth, 1)
 		_i.loop_depth -= 1;
