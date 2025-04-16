@@ -14,31 +14,46 @@ function RunGML_Interpreter(_name="RunGML_I") constructor {
 	loop_iter = [];
 	
 	run = function(_l) {
-		if array_length(_l) < 1 return;
+		static _temp_list_cache = [];
+		
+		var _list_length = array_length(_l);
+		if _list_length < 1 return;
+		
+		//Pop a temporary array out of our cache. If no array is available, create a new one
+		var _temp_list = array_pop(_temp_list_cache) ?? [];
+		
+		//Copy the contents of our input list to the temporary list
+		array_copy(_temp_list, 0, _l, 0, _list_length);
+		
 		recursion += 1
-		if debug show_debug_message(@"RunGML_I:{0}[{1}].run({2})", name, recursion, _l);
-		var _n_args = array_length(_l);
-		for (var i=0; i<_n_args; i++) {
-			if is_array(_l[i]) {
-				_l[i] = run(_l[i]);
+		if debug show_debug_message(@"RunGML_I:{0}[{1}].run({2})", name, recursion, _temp_list);
+		for (var i=0; i<_list_length; i++) {
+			if is_array(_temp_list[i]) {
+				_temp_list[i] = run(_temp_list[i]);
 			}
 		}
 		
-		var _op_name = array_shift(_l);
+		var _op_name = array_shift(_temp_list);
 		var _out = _op_name;
 		while struct_exists(aliases, _op_name) {
 			_op_name = struct_get(aliases, _op_name);	
 		}
 		if struct_exists(ops, _op_name) {
 			var _op = struct_get(ops, _op_name);
-			if debug show_debug_message(@"RunGML_I:{0}[{1}].exec({2}({3}))", name, recursion, _op_name, _l);
-			_out = _op.exec(self, _l);
+			if debug show_debug_message(@"RunGML_I:{0}[{1}].exec({2}({3}))", name, recursion, _op_name, _temp_list);
+			_out = _op.exec(self, _temp_list);
 			if is_instanceof(_out, RunGML_Error) {
 				_out.warn(self);
 				//_out = undefined;
 			}
 		}
+		
 		recursion -= 1;
+		
+		//Return the temporary list to the global stack
+		array_resize(_temp_list, 0);
+		array_push(_temp_list_cache, _temp_list);
+		
 		return _out;
 	}
 }
@@ -815,7 +830,7 @@ new RunGML_Op("export",
 	
 new RunGML_Op("list",
 	function(_i, _l=[]) {
-		return _l;
+		return variable_clone(_l);
 	},
 @"Return arguments as a list
 - args: []
