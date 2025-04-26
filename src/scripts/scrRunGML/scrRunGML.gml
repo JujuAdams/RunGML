@@ -1,4 +1,4 @@
-#macro RunGML_Version "1.0.3"
+#macro RunGML_Version "1.0.4"
 #macro RunGML_Homepage "https://github.com/sdelaughter/RunGML"
 
 
