@@ -27,7 +27,6 @@ max_history = 20;
 command_history = [];
 command_history_pos = -1;
 command_history_max = 100;
-pause_game = RunGML_Console_doPause;
 
 key_hold_delay = 0.5;
 key_hold_rate = 0.1;
@@ -66,17 +65,20 @@ alphabet = noone;
 separators = [" ", ",", ".", ":", ";", "'", "\"", "_", "-", "<", ">", "[", "]", "{", "}"]
 
 toggle = function(_set=!enabled) {
+	if !RunGML_Console_canToggle {
+		enabled = false;
+		return;
+	}
 	enabled = _set;
 	if enabled {
 		age = 0;
-		if pause_game global.paused = true;
-	} else {
 		keyboard_lastkey = -1;
 		keyboard_lastchar = "";
+		keyboard_string = ""
 		clear_line();
 		command_history_pos = 0;
-		if pause_game global.paused = false;
 	}
+	RunGML_Console_OnToggle(enabled);
 }
 
 clear_line = function() {

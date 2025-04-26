@@ -7,11 +7,12 @@
 // Set the key to toggle the console on/off
 #macro RunGML_Console_toggleKey vk_f9
 
+// Determine whether the console can be used
+// For example, set to the value of a DEV_MODE macro to disable console access for players
+#macro RunGML_Console_canToggle true
+
 // Always recreate the console if it's destroyed (starts inactive -- press key defined above to activate)
 #macro RunGML_Console_superPersistent true
-
-// Toggling the console will automatically toggle global.paused
-#macro RunGML_Console_doPause false
 
 // Allow new operator definitions to overwrite existing ones
 #macro RunGML_overwriteOps true
@@ -36,6 +37,12 @@ global.RunGML_Console_lineHeight = 18;
 // Sets default behavior, can be changed for specific interpreter instances
 // The console interpreter will throw to its display regardless
 global.RunGML_throwErrors = false;
+
+// Define custom behavior when toggling the console on/off
+// For example: `global.paused = _enabled`
+function RunGML_Console_OnToggle(_enabled) {
+	
+}
 
 // Define your own operators, aliases, and colors inside this function
 function RunGML_ConfigOps() {

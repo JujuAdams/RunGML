@@ -1,5 +1,10 @@
 # RunGML Patch Notes
 
+## 1.0.4 (2025-04-26)
+- Fixed a bug that caused the console to record keystrokes while inactive
+- Replaced `RunGML_Console_doPause` macro with user-definable `RunGML_Console_onToggle(_enabled)` function
+- Added `RunGML_Console_canToggle` macro
+
 ## 1.0.3 (2025-04-16)
 - Improved efficiency of memory allocation in the interpreter by making list execution non-destructive (Thank you @JujuAdams!)
 
