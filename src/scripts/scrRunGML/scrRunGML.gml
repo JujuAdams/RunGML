@@ -1296,7 +1296,7 @@ new RunGML_Op("array",
 				return _l;
 				break;
 			case 2:
-				if _l[1] < array_length(_l[0]) return undefined;
+				if _l[1] >= array_length(_l[0]) return undefined;
 				return _l[0][_l[1]];
 				break;
 			case 3:
