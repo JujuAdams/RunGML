@@ -2,20 +2,22 @@
 
 // Perform constraint validation.  Show an error if an operator receives the wrong number or type of arguments.
 // For debugging purposes, will negatively impact performance
-#macro RunGML_I_checkConstraints false
+global.RunGML_I_checkConstraints = false;
 
 // Set the key to toggle the console on/off
-#macro RunGML_Console_toggleKey vk_f9
+global.RunGML_Console_toggleKey = vk_f9
 
 // Determine whether the console can be used
 // For example, set to the value of a DEV_MODE macro to disable console access for players
-#macro RunGML_Console_canToggle true
+global.RunGML_Console_canToggle = true
 
 // Always recreate the console if it's destroyed (starts inactive -- press key defined above to activate)
-#macro RunGML_Console_superPersistent true
+global.RunGML_Console_superPersistent = true
 
-// Allow new operator definitions to overwrite existing ones
-#macro RunGML_overwriteOps true
+// Allow new definitions to overwrite existing ones
+global.RunGML_overwriteOps = true
+global.RunGML_overwriteAliases = false
+global.RunGML_overwriteConstants = false
 
 // Enable debug output for interpreters
 // Sets default behavior, can be changed for specific interpreter instances.
@@ -44,7 +46,7 @@ global.RunGML_throwErrors = false;
 // For import: LooseJSONRead and LooseJSONBufferRead
 // For export: LooseJSONWrite and LooseJSONBufferWrite
 // Note: If you use quotes with LooseJSON, they must be double quotes, and commas are still required
-global.RunGML_importLooseJSON = false;
+global.RunGML_importLooseJSON = true;
 global.RunGML_exportLooseJSON = false;
 
 // Attempt to interpret the first argument of any list as a built-in asset/function
@@ -75,11 +77,14 @@ function RunGML_ConfigOps() {
 		[new RunGML_Constraint_ArgCount("geq", 0)]
 	)
 
-	// Operators can also define constants instead of functions
-	new RunGML_Op("test_constant", 42);
+	// Operators can also define constant values
+	RunGML_Op("test_constant", 42);
 
 	// You can also define aliases for operators
 	RunGML_alias("test_alias", "test_operator")
+	
+	// Or even define aliases for other aliases, ad infinitum
+	RunGML_alias("test_alias_alias", "test_alias");
 	
 	// And define new color names for use with the "color" operator
 	RunGML_color("seafoam", #78aa9f)
